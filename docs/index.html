@@ -33,12 +33,6 @@
         `
     });
 
-    const sfc_layout_main_footer = defineComponent({
-        template: /*html*/`
-            <v-footer app color="black" class="justify-center align-center">Copyright</v-footer>
-        `
-    });
-
     const sfc_layout_main_header = defineComponent({
         template: /*html*/`
             <v-app-bar density="compact" class="text-white">
@@ -138,15 +132,13 @@
                 <v-main>
                     <router-view></router-view>
                 </v-main>
-                <x-footer></x-footer>
             </v-app>
         `,
         components: {
             "x-loading": sfc_layout_main_loading,
             "x-notify": sfc_layout_main_notify,
             "x-navigation": sfc_layout_main_navigation,
-            "x-header": sfc_layout_main_header,
-            "x-footer": sfc_layout_main_footer
+            "x-header": sfc_layout_main_header
         }
     });
 

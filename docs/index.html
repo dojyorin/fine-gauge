@@ -1,0 +1,393 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="height=device-height,width=device-width,minimum-scale=1,maximum-scale=1,initial-scale=1,user-scalable=no">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50%' y='50%' style='dominant-baseline:central;text-anchor:middle;font-size:100px;'>🚥</text></svg>">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@3/dist/vuetify.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7/css/materialdesignicons.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=M+PLUS+1+Code:wght@100;200;300;400;500;600;700">
+
+<script type="importmap">
+    {
+        "imports": {
+            "vue": "https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.prod.min.js",
+            "@vue/devtools-api": "https://cdn.jsdelivr.net/npm/@vue/devtools-api@6/lib/esm/index.min.js"
+        }
+    }
+</script>
+
+<script async type="module">
+    import {createApp, defineComponent, ref, reactive, inject, computed} from "https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.prod.min.js";
+    import {createRouter, createWebHashHistory, useRouter} from "https://cdn.jsdelivr.net/npm/vue-router@4/dist/vue-router.esm-browser.min.js";
+    import {createVuetify, useDisplay, useLayout} from "https://cdn.jsdelivr.net/npm/vuetify@3/dist/vuetify.esm.min.js";
+
+    import confetti from "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.module.mjs";
+
+    const sfc_common_reflect = defineComponent({
+        template: /*html*/`
+            <div class="x-reflect">
+                <slot></slot>
+            </div>
+        `
+    });
+
+    const sfc_layout_main_footer = defineComponent({
+        template: /*html*/`
+            <v-footer app color="black" class="justify-center align-center">Copyright</v-footer>
+        `
+    });
+
+    const sfc_layout_main_header = defineComponent({
+        template: /*html*/`
+            <v-app-bar density="compact" class="text-white">
+                <v-app-bar-nav-icon @click="nav = !nav"></v-app-bar-nav-icon>
+                <v-app-bar-title class="text-h5">Application</v-app-bar-title>
+
+                <template #image>
+                    <v-img gradient="45deg, #174AFF, #0ECDFF"></v-img>
+                </template>
+            </v-app-bar>
+        `,
+        setup(){
+            const nav = inject("@layout:navigation");
+
+            return {nav};
+        }
+    });
+
+    const sfc_layout_main_loading = defineComponent({
+        template: /*html*/`
+            <v-overlay persistent no-click-animation z-index="4000" class="justify-center align-center" v-model="loading">
+                <v-progress-circular indeterminate size="60" width="4" color="primary"></v-progress-circular>
+            </v-overlay>
+        `,
+        setup(){
+            const loading = inject("@layout:loading");
+
+            return {loading};
+        }
+    });
+
+    const sfc_layout_main_navigation = defineComponent({
+        template: /*html*/`
+            <v-navigation-drawer floating temporary v-model="nav">
+                <v-toolbar density="compact" color="transparent">
+                    <v-btn icon="mdi-close" @click="nav = false"></v-btn>
+                </v-toolbar>
+
+                <v-list nav density="compact">
+                    <v-list-item v-for="{path, name} in routes" :to="path">
+                        <v-list-item-title>{{name}}</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-navigation-drawer>
+        `,
+        setup(){
+            const router = useRouter();
+
+            const nav = inject("@layout:navigation");
+
+            const routes = router.options.routes.filter(({path}) => !/:/.test(path));
+
+            return {nav, routes};
+        }
+    });
+
+    const sfc_layout_main_notify = defineComponent({
+        template: /*html*/`
+            <v-snackbar v-for="notify in notifies" model-value position="fixed" location="top" z-index="3000" :color="notify.color" timeout="-1" v-bind="notifyTimeout(notify, 5000)">
+                <div>{{notify.message}}</div>
+
+                <template #actions>
+                    <v-btn ripple density="comfortable" icon="mdi-close" @click="notifyTimeout(notify, 0)"></v-btn>
+                </template>
+            </v-snackbar>
+        `,
+        setup(){
+            const notifies = inject("@layout:notify");
+
+            async function notifyTimeout(notify, ms){
+                await new Promise(done => setTimeout(done, ms));
+
+                const i = notifies.findIndex(v => v === notify);
+
+                if(i === -1){
+                    return;
+                }
+
+                notifies.splice(i, 1);
+            }
+
+            return {notifies, notifyTimeout};
+        }
+    });
+
+    const sfc_layout_main = defineComponent({
+        template: /*html*/`
+            <v-app>
+                <x-loading></x-loading>
+                <x-notify></x-notify>
+                <x-navigation></x-navigation>
+                <x-header></x-header>
+                <v-main>
+                    <router-view></router-view>
+                </v-main>
+                <x-footer></x-footer>
+            </v-app>
+        `,
+        components: {
+            "x-loading": sfc_layout_main_loading,
+            "x-notify": sfc_layout_main_notify,
+            "x-navigation": sfc_layout_main_navigation,
+            "x-header": sfc_layout_main_header,
+            "x-footer": sfc_layout_main_footer
+        }
+    });
+
+    const sfc_page_home = defineComponent({
+        template: /*html*/`
+            <v-container fluid>
+                <v-row no-gutters justify="center">
+                    <v-col cols sm="8" md="4">
+                        <v-list>
+                            <template v-for="(action, i) in actions">
+                                <v-divider v-if="i"></v-divider>
+                                <v-list-item>
+                                    <v-list-title v-if="!action._edit">{{action.name}}</v-list-title>
+                                    <v-text-field v-else single-line variant="underlined" v-model="action.name"></v-text-field>
+
+                                    <template #prepend>
+                                        <v-avatar color="grey-lighten-1">
+                                            <v-icon>mdi-numeric-{{actions.length - i}}</v-icon>
+                                          </v-avatar>
+                                    </template>
+
+                                    <template #append>
+                                        <v-btn :disabled="actions.some(({_edit}) => _edit) && !action._edit" flat color="transparent" density="comfortable" icon="mdi-text-box-edit-outline" @click="action._edit = !action._edit"></v-btn>
+                                        <v-btn :disabled="actions.some(({_edit}) => _edit)" flat color="transparent" density="comfortable" icon="mdi-menu-up-outline" @click="i > 0 && actions.splice(i - 1, 2, actions[i], actions[i - 1])"></v-btn>
+                                        <v-btn :disabled="actions.some(({_edit}) => _edit)" flat color="transparent" density="comfortable" icon="mdi-menu-down-outline" @click="i + 1 < actions.length && actions.splice(i, 2, actions[i + 1], actions[i])"></v-btn>
+                                    </template>
+                                </v-list-item>
+                            </template>
+                        </v-list>
+                        <v-textarea placeholder="ひとこと日記"></v-textarea>
+                    </v-col>
+                </v-row>
+                <v-btn @click="log(actions)">debug</v-btn>
+            </v-container>
+        `,
+        setup(){
+            const notifies = inject("@layout:notify");
+            const actions = inject("@actions");
+
+            function log(v){
+                console.log(v);
+                confetti();
+            }
+
+            return {actions, log};
+        }
+    });
+
+    const sfc_page_graph = defineComponent({
+        template: /*html*/`
+            <v-container fluid>
+                <v-row no-gutters justify="center">
+                    <v-col cols sm="8" md="4">
+                        <v-row>
+                            <v-col cols>
+                                <v-card>
+                                    <v-card-title>Graph</v-card-title>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-col>
+                </v-row>
+            </v-container>
+        `
+    });
+
+    const sfc_page_setting = defineComponent({
+        template: /*html*/`
+            <v-container fluid>
+                <v-row no-gutters justify="center">
+                    <v-col cols sm="8" md="4">
+                        <v-row>
+                            <v-col cols>
+                                <v-card>
+                                    <v-card-title>Setting</v-card-title>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-col>
+                </v-row>
+            </v-container>
+        `
+    });
+
+    const sfc_page_backup = defineComponent({
+        template: /*html*/`
+            <v-container fluid>
+                <v-row no-gutters justify="center">
+                    <v-col cols sm="8" md="4">
+                        <v-row>
+                            <v-col cols>
+                                <v-card>
+                                    <v-card-title>Backup</v-card-title>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-col>
+                </v-row>
+            </v-container>
+        `
+    });
+
+    const sfc_page_about = defineComponent({
+        template: /*html*/`
+            <v-container fluid>
+                <v-row no-gutters justify="center">
+                    <v-col cols sm="8" md="4">
+                        <v-row>
+                            <v-col cols>
+                                <v-card>
+                                    <v-card-title>About</v-card-title>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-col>
+                </v-row>
+            </v-container>
+        `
+    });
+
+    const router = createRouter({
+        history: createWebHashHistory(),
+        routes: [{
+            path: "/",
+            name: "Home",
+            component: sfc_page_home
+        }, {
+            path: "/graph",
+            name: "Graph",
+            component: sfc_page_graph
+        }, {
+            path: "/setting",
+            name: "Setting",
+            component: sfc_page_setting
+        }, {
+            path: "/backup",
+            name: "Backup",
+            component: sfc_page_backup
+        }, {
+            path: "/about",
+            name: "About",
+            component: sfc_page_about
+        }, {
+            path: "/:catchAll(.*)",
+            redirect: "/"
+        }]
+    });
+
+    const vuetify = createVuetify({
+        theme: {
+            defaultTheme: "main",
+            themes: {
+                "main": {
+                    dark: false,
+                    colors: {
+                        primary: "#03A9F4",
+                        secondary: "#9C27B0",
+                        surface: "#FFFFFF",
+                        background: "#FFFFFF",
+                        info: "#2196F3",
+                        success: "#4CAF50",
+                        warning: "#FFC107",
+                        error: "#FF5252"
+                    }
+                }
+            }
+        }
+    });
+
+    const component = {
+        install(context){
+            context.component("x-reflect", sfc_common_reflect);
+        }
+    };
+
+    const provide = {
+        install(context){
+            context.provide("@layout:navigation", ref(false));
+            context.provide("@layout:loading", ref(false));
+            context.provide("@layout:notify", reactive([]));
+
+            context.provide("@actions", reactive([{
+                name: "aaa",
+                _edit: false
+            }, {
+                name: "bbb",
+                _edit: false
+            }, {
+                name: "ccc",
+                _edit: false
+            }, {
+                name: "ddd",
+                _edit: false
+            }, {
+                name: "eee",
+                _edit: false
+            }, {
+                name: "fff",
+                _edit: false
+            }, {
+                name: "ggg",
+                _edit: false
+            }, {
+                name: "hhh",
+                _edit: false
+            }, {
+                name: "iii",
+                _edit: false
+            }, {
+                name: "jjj",
+                _edit: false
+            }]));
+        }
+    };
+
+    const vue = createApp(sfc_layout_main);
+
+    vue.use(router);
+    vue.use(vuetify);
+    vue.use(component);
+    vue.use(provide);
+
+    vue.mount("#vue");
+</script>
+
+<style>
+    ::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    :focus {
+        outline: none !important;
+    }
+
+    * {
+        font-family: "M PLUS 1 Code" !important;
+    }
+
+    .v-btn {
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        text-indent: 0 !important;
+    }
+</style>
+
+<title>Application</title>
+
+<div id="vue"></div>

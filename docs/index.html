@@ -166,8 +166,13 @@
                             </template>
                         </v-list>
 
-                        <v-rating hover length="10" size="32" active-color="pink" v-model="energy"></v-rating>
+                        <div class="d-flex justify-center">
+                            <v-rating hover length="10" size="32" active-color="pink" v-model="energy"></v-rating>
+                        </div>
+
                         <v-textarea placeholder="ひとこと日記" v-model="memo"></v-textarea>
+
+                        <v-btn color="green" @click="registEntry()">登録</v-btn>
 
                         <v-btn @click="debugLog(achieves, energy, memo)">debug</v-btn>
                     </v-col>
@@ -189,7 +194,14 @@
                 });
             }
 
-            return {achieves, energy, memo, debugLog};
+            function registEntry(){
+                notifies.push({
+                    message: "dummy",
+                    color: "green"
+                });
+            }
+
+            return {achieves, energy, memo, registEntry, debugLog};
         }
     });
 

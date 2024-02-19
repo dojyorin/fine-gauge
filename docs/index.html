@@ -166,7 +166,7 @@
                             </template>
                         </v-list>
                         <v-rating hover length="10" active-color="pink" v-model="energy"></v-rating>
-                        <v-textarea placeholder="ひとこと日記"></v-textarea>
+                        <v-textarea placeholder="ひとこと日記" v-model="memo"></v-textarea>
                         <v-btn @click="debugLog(achieves, energy)">debug</v-btn>
                     </v-col>
                 </v-row>
@@ -176,13 +176,14 @@
             const notifies = inject("@layout:notify");
             const achieves = inject("@achieves");
             const energy = inject("@energy");
+            const memo = inject("@memo");
 
             function debugLog(...v){
                 console.log(...v);
                 confetti();
             }
 
-            return {achieves, energy, debugLog};
+            return {achieves, energy, memo, debugLog};
         }
     });
 
@@ -321,6 +322,7 @@
 
             context.provide("@achieves", reactive([...new Array(10)].map(() => ({name: "", _edit: false}))));
             context.provide("@energy", ref(0));
+            context.provide("@memo", ref(""));
         }
     };
 

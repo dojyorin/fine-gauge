@@ -155,7 +155,7 @@
                                 <v-divider v-if="i"></v-divider>
                                 <v-list-item>
                                     <v-list-title v-if="!achieve._edit">{{achieve.name || "(未設定)"}}</v-list-title>
-                                    <v-text-field v-else single-line variant="underlined" v-model="achieve.name"></v-text-field>
+                                    <v-text-field v-else single-line clearable variant="underlined" v-model="achieve.name"></v-text-field>
 
                                     <template #append>
                                         <v-btn v-if="achieve._edit" :disabled="i === 0" flat color="transparent" density="comfortable" icon="mdi-menu-up-outline" @click="achieves.splice(i - 1, 2, achieves[i], achieves[i - 1])"></v-btn>
@@ -165,22 +165,28 @@
                                 </v-list-item>
                             </template>
                         </v-list>
-                        <v-rating hover length="10" active-color="pink" v-model="energy"></v-rating>
+
+                        <v-rating hover length="10" size="32" active-color="pink" v-model="energy"></v-rating>
                         <v-textarea placeholder="ひとこと日記" v-model="memo"></v-textarea>
-                        <v-btn @click="debugLog(achieves, energy)">debug</v-btn>
+
+                        <v-btn @click="debugLog(achieves, energy, memo)">debug</v-btn>
                     </v-col>
                 </v-row>
             </v-container>
         `,
         setup(){
             const notifies = inject("@layout:notify");
-            const achieves = inject("@achieves");
+            const achieves = inject("@achieve");
             const energy = inject("@energy");
             const memo = inject("@memo");
 
             function debugLog(...v){
-                console.log(...v);
                 confetti();
+                console.log(...v);
+                notifies.push({
+                    message: "Console Log",
+                    color: "green"
+                });
             }
 
             return {achieves, energy, memo, debugLog};
@@ -320,7 +326,7 @@
             context.provide("@layout:loading", ref(false));
             context.provide("@layout:notify", reactive([]));
 
-            context.provide("@achieves", reactive([...new Array(10)].map(() => ({name: "", _edit: false}))));
+            context.provide("@achieve", reactive([...new Array(10)].map(() => ({name: "", _edit: false}))));
             context.provide("@energy", ref(0));
             context.provide("@memo", ref(""));
         }

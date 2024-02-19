@@ -23,11 +23,14 @@
     import {createRouter, createWebHashHistory, useRouter} from "https://cdn.jsdelivr.net/npm/vue-router@4/dist/vue-router.esm-browser.min.js";
     import {createVuetify, useDisplay, useLayout} from "https://cdn.jsdelivr.net/npm/vuetify@3/dist/vuetify.esm.min.js";
 
-    import confetti from "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.module.mjs";
+    import {Dexie} from "https://esm.sh/dexie@3.2.6?bundle&target=esnext";
+    import {Chart} from "https://esm.sh/chart.js@4.4.1?bundle&target=esnext";
+    import confetti from "https://esm.sh/canvas-confetti@1.9.2?bundle&target=esnext";
+    import {} from "https://esm.sh/gh/dojyorin/deno_simple_utility@v2.0.6/mod.pure.full.ts?bundle&target=esnext";
 
     const sfc_common_reflect = defineComponent({
         template: /*html*/`
-            <div class="x-reflect">
+            <div>
                 <slot></slot>
             </div>
         `
@@ -154,36 +157,32 @@
                                     <v-list-title v-if="!achieve._edit">{{achieve.name || "(未設定)"}}</v-list-title>
                                     <v-text-field v-else single-line variant="underlined" v-model="achieve.name"></v-text-field>
 
-                                    <template #prepend>
-                                        <v-avatar color="grey-lighten-1">
-                                            <v-icon>mdi-numeric-{{achieves.length - i}}</v-icon>
-                                          </v-avatar>
-                                    </template>
-
                                     <template #append>
+                                        <v-btn v-if="achieve._edit" :disabled="i === 0" flat color="transparent" density="comfortable" icon="mdi-menu-up-outline" @click="achieves.splice(i - 1, 2, achieves[i], achieves[i - 1])"></v-btn>
+                                        <v-btn v-if="achieve._edit" :disabled="i + 1 === achieves.length" flat color="transparent" density="comfortable" icon="mdi-menu-down-outline" @click="achieves.splice(i, 2, achieves[i + 1], achieves[i])"></v-btn>
                                         <v-btn :disabled="achieves.some(({_edit}) => _edit) && !achieve._edit" flat color="transparent" density="comfortable" :icon="achieve._edit ? 'mdi-text-box-check-outline' : 'mdi-text-box-edit-outline'" @click="achieve._edit = !achieve._edit"></v-btn>
-                                        <v-btn :disabled="achieves.some(({_edit}) => _edit)" flat color="transparent" density="comfortable" icon="mdi-menu-up-outline" @click="i > 0 && achieves.splice(i - 1, 2, achieves[i], achieves[i - 1])"></v-btn>
-                                        <v-btn :disabled="achieves.some(({_edit}) => _edit)" flat color="transparent" density="comfortable" icon="mdi-menu-down-outline" @click="i + 1 < achieves.length && achieves.splice(i, 2, achieves[i + 1], achieves[i])"></v-btn>
                                     </template>
                                 </v-list-item>
                             </template>
                         </v-list>
+                        <v-rating hover length="10" active-color="pink" v-model="energy"></v-rating>
                         <v-textarea placeholder="ひとこと日記"></v-textarea>
+                        <v-btn @click="debugLog(achieves, energy)">debug</v-btn>
                     </v-col>
                 </v-row>
-                <v-btn @click="log(achieves)">debug</v-btn>
             </v-container>
         `,
         setup(){
             const notifies = inject("@layout:notify");
             const achieves = inject("@achieves");
+            const energy = inject("@energy");
 
-            function log(v){
-                console.log(v);
+            function debugLog(...v){
+                console.log(...v);
                 confetti();
             }
 
-            return {achieves, log};
+            return {achieves, energy, debugLog};
         }
     });
 
@@ -321,6 +320,7 @@
             context.provide("@layout:notify", reactive([]));
 
             context.provide("@achieves", reactive([...new Array(10)].map(() => ({name: "", _edit: false}))));
+            context.provide("@energy", ref(0));
         }
     };
 

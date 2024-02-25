@@ -1,3 +1,3 @@
-# **Daily Achieve**
+# **元気ゲージ**
 
 WIP.

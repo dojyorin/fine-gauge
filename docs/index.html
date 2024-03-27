@@ -377,3 +377,399 @@
 <title>元気ゲージ</title>
 
 <div id="vue"></div>
+
+
+
+<!doctype html>
+<meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="height=device-height,width=device-width,minimum-scale=1,maximum-scale=1,initial-scale=1,user-scalable=no">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50%' y='50%' style='dominant-baseline:central;text-anchor:middle;font-size:100px;'>🌌</text></svg>">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@3/dist/vuetify.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7/css/materialdesignicons.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=M+PLUS+1+Code:wght@100;200;300;400;500;600;700">
+
+<script type="importmap">
+    {
+        "imports": {
+            "vue": "https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.prod.min.js",
+            "@vue/devtools-api": "https://cdn.jsdelivr.net/npm/@vue/devtools-api@6/lib/esm/index.min.js"
+        }
+    }
+</script>
+
+<script async type="module">
+    import {createApp, defineComponent, ref, reactive, inject, computed} from "https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.prod.min.js";
+    import {createRouter, createWebHashHistory, useRouter} from "https://cdn.jsdelivr.net/npm/vue-router@4/dist/vue-router.esm-browser.min.js";
+    import {createVuetify, useDisplay, useLayout, useTheme} from "https://cdn.jsdelivr.net/npm/vuetify@3/dist/vuetify.esm.min.js";
+
+    function useCommonUI(){
+        const nav = inject("$_nav");
+        const loading = inject("$_loading");
+        const notifies = inject("$_notifies");
+
+        /**
+        * @param {boolean} [state]
+        */
+        function toggleNav(state){
+            nav.value = state ?? !nav.value;
+        }
+
+        /**
+        * @param {boolean} [state]
+        */
+        function toggleLoading(state){
+            loading.value = state ?? !loading.value;
+        }
+
+        /**
+        * @param {string} message
+        * @param {string} color
+        */
+        function pushNotify(message, color){
+            notifies.push({
+                message: message,
+                color: color
+            });
+        }
+
+        return {toggleNav, toggleLoading, pushNotify};
+    }
+
+    const components_reflect = defineComponent({
+        template: /*html*/`
+            <div sfc_common_reflect class="x-reflect">
+                <slot></slot>
+            </div>
+        `
+    });
+
+    const components_layout_footer = defineComponent({
+        template: /*html*/`
+            <v-footer app class="justify-center align-center">Copyright</v-footer>
+        `
+    });
+
+    const components_layout_header = defineComponent({
+        template: /*html*/`
+            <v-app-bar density="compact" class="text-white">
+                <v-app-bar-nav-icon @click="toggleNav()"></v-app-bar-nav-icon>
+                <v-app-bar-title class="text-h5">Application</v-app-bar-title>
+
+                <template #image>
+                    <v-img gradient="45deg, #174AFF, #0ECDFF"></v-img>
+                </template>
+            </v-app-bar>
+        `,
+        setup(){
+            const {toggleNav} = useCommonUI();
+
+            return {toggleNav};
+        }
+    });
+
+    const components_layout_loading = defineComponent({
+        template: /*html*/`
+            <v-overlay persistent no-click-animation z-index="4000" class="justify-center align-center" v-model="loading">
+                <v-progress-circular indeterminate size="60" width="4" color="primary"></v-progress-circular>
+            </v-overlay>
+        `,
+        setup(){
+            const loading = inject("$_loading");
+
+            return {loading};
+        }
+    });
+
+    const components_layout_navigation = defineComponent({
+        template: /*html*/`
+            <v-navigation-drawer floating temporary v-model="nav">
+                <v-list nav density="compact">
+                    <v-list-item v-for="{path, name} in routes" :to="path">
+                        <v-list-item-title>{{name}}</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+
+                <template #append>
+                    <v-btn tile block prepend-icon="mdi-theme-light-dark" @click="toggleTheme">Light/Dark</v-btn>
+                </template>
+            </v-navigation-drawer>
+        `,
+        setup(){
+            const nav = inject("$_nav");
+            const theme = useTheme();
+            const router = useRouter();
+            const routes = router.options.routes.filter(({path}) => !/:/.test(path));
+
+            function toggleTheme(){
+                theme.global.name.value = theme.global.current.value.dark ? "light" : "dark";
+            }
+
+            return {nav, routes, toggleTheme};
+        }
+    });
+
+    const components_layout_notify = defineComponent({
+        template: /*html*/`
+            <v-snackbar v-for="notify in notifies" model-value position="fixed" location="top" z-index="3000" :color="notify.color" timeout="-1" v-bind="notifyTimeout(notify, 5000)">
+                <div>{{notify.message}}</div>
+
+                <template #actions>
+                    <v-btn ripple density="comfortable" icon="mdi-close" @click="notifyTimeout(notify, 0)"></v-btn>
+                </template>
+            </v-snackbar>
+        `,
+        setup(){
+            const notifies = inject("$_notifies");
+
+            /**
+            * @param {Record<string, string>} notify
+            * @param {number} ms
+            */
+            async function notifyTimeout(notify, ms){
+                await new Promise(done => setTimeout(done, ms));
+
+                const i = notifies.findIndex(v => v === notify);
+
+                if(i === -1){
+                    return;
+                }
+
+                notifies.splice(i, 1);
+            }
+
+            return {notifies, notifyTimeout};
+        }
+    });
+
+    const layouts_default = defineComponent({
+        template: /*html*/`
+            <v-app>
+                <x-loading></x-loading>
+                <x-notify></x-notify>
+                <x-navigation></x-navigation>
+                <x-header></x-header>
+                <v-main>
+                    <router-view></router-view>
+                </v-main>
+                <x-footer></x-footer>
+            </v-app>
+        `,
+        components: {
+            "x-loading": components_layout_loading,
+            "x-notify": components_layout_notify,
+            "x-navigation": components_layout_navigation,
+            "x-header": components_layout_header,
+            "x-footer": components_layout_footer
+        }
+    });
+
+    const pages_index = defineComponent({
+        template: /*html*/`
+            <v-container fluid>
+                <v-row justify="center">
+                    <v-col cols>
+                        <v-card>
+                            <v-card-item>
+                                <v-card-title class="text-center">{{count}} : {{countx}}</v-card-title>
+                            </v-card-item>
+
+                            <v-card-actions class="justify-center">
+                                <v-btn color="green" variant="flat" @click="increment()">Increment</v-btn>
+                                <v-btn color="purple" variant="flat" @click="incrementx()">IncrementX</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-container>
+        `,
+        setup(){
+            const {pushNotify} = useCommonUI();
+            const count = ref(0);
+            const countx = inject("$count");
+
+            function increment(){
+                count.value++;
+                pushNotify("Increment!", "green");
+            }
+
+            function incrementx(){
+                countx.value++;
+                pushNotify("IncrementX!", "purple");
+            }
+
+            return {count, countx, increment, incrementx};
+        }
+    });
+
+    const pages_sub = defineComponent({
+        template: /*html*/`
+            <v-container fluid>
+                <v-row justify="center">
+                    <v-col cols>
+                        <v-card>
+                            <v-card-item>
+                                <v-card-title class="text-center">{{countx}}</v-card-title>
+                            </v-card-item>
+
+                            <v-card-actions class="justify-center">
+                                <x--reflect>
+                                    <v-btn color="orange-darken-1" variant="flat" @click="resetx()">ResetX</v-btn>
+                                    <v-btn color="teal-darken-1" variant="flat" @click="delayresetx()">DelayResetX</v-btn>
+                                </x--reflect>
+                            </v-card-actions>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-container>
+        `,
+        setup(){
+            const {toggleLoading, pushNotify} = useCommonUI();
+            const countx = inject("$count");
+
+            function resetx(){
+                countx.value = 0;
+                pushNotify("ResetX!", "orange-darken-1");
+            }
+
+            async function delayresetx(){
+                toggleLoading(true);
+                await new Promise(done => setTimeout(done, 1000));
+                countx.value = 0;
+                toggleLoading(false);
+                pushNotify("ResetDelayX!", "teal-darken-1");
+            }
+
+            return {countx, resetx, delayresetx};
+        }
+    });
+
+    const pages_third = defineComponent({
+        template: /*html*/`
+            <v-img :height="height" class="text-center align-center text-white" gradient="45deg, #FF9F17, #FF4E0E">
+                <div v-if="mobile" class="text-h4">MOBILE</div>
+                <div v-else class="text-h2">DESKTOP</div>
+            </v-img>
+        `,
+        setup(){
+            const display = useDisplay();
+            const layout = useLayout();
+            const mobile = computed(() => display.mobile.value);
+            const height = computed(() => display.height.value - layout.mainRect.value.top - layout.mainRect.value.bottom);
+
+            return {mobile, height};
+        }
+    });
+
+    const router = createRouter({
+        history: createWebHashHistory(),
+        routes: [{
+            path: "/",
+            name: "home",
+            component: pages_index
+        }, {
+            path: "/sub",
+            name: "sub",
+            component: pages_sub
+        }, {
+            path: "/third",
+            name: "third",
+            component: pages_third
+        }, {
+            path: "/:catchAll(.*)",
+            redirect: "/"
+        }]
+    });
+
+    const vuetify = createVuetify();
+
+    const component = {
+        install(context){
+            context.component("x--reflect", components_reflect);
+        }
+    };
+
+    const provide = {
+        install(context){
+            context.provide("$_nav", ref(false));
+            context.provide("$_loading", ref(false));
+            context.provide("$_notifies", reactive([]));
+            context.provide("$count", ref(0));
+        }
+    };
+
+    const vue = createApp(layouts_default);
+    vue.use(router);
+    vue.use(vuetify);
+    vue.use(component);
+    vue.use(provide);
+    vue.mount("#vue");
+</script>
+
+<style>
+    ::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    :focus {
+        outline: none !important;
+    }
+
+    * {
+        font-family: "M PLUS 1 Code" !important;
+    }
+
+    .v-btn {
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        text-indent: 0 !important;
+    }
+
+    @keyframes x-reflect--sfc_common_reflect {
+        0% {
+            transform: scale(0) rotate(45deg);
+            opacity: 0;
+        }
+
+        75% {
+            transform: scale(0) rotate(45deg);
+            opacity: 0.5;
+        }
+
+        80% {
+            transform: scale(5) rotate(45deg);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(50) rotate(45deg);
+            opacity: 0;
+        }
+    }
+
+    .x-reflect[sfc_common_reflect] {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .x-reflect[sfc_common_reflect]::after {
+        pointer-events: none;
+        content: "";
+        position: absolute;
+        display: block;
+        top: -180px;
+        left: 0;
+        height: 100%;
+        width: 30px;
+        opacity: 0;
+        background-color: #FFFFFF;
+        transform: rotate(45deg);
+        animation: x-reflect--sfc_common_reflect 5s ease-in-out infinite;
+    }
+</style>
+
+<title>Application</title>
+
+<div id="vue"></div>

@@ -69,12 +69,6 @@
         `
     });
 
-    const components_layout_footer = defineComponent({
-        template: /*html*/`
-            <v-footer app class="justify-center align-center">Copyright</v-footer>
-        `
-    });
-
     const components_layout_header = defineComponent({
         template: /*html*/`
             <v-app-bar density="compact" class="text-white">
@@ -177,15 +171,13 @@
                 <v-main>
                     <router-view></router-view>
                 </v-main>
-                <x-footer></x-footer>
             </v-app>
         `,
         components: {
             "x-loading": components_layout_loading,
             "x-notify": components_layout_notify,
             "x-navigation": components_layout_navigation,
-            "x-header": components_layout_header,
-            "x-footer": components_layout_footer
+            "x-header": components_layout_header
         }
     });
 

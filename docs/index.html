@@ -223,7 +223,7 @@
         `,
         setup(){
             const {pushNotify} = useCommonUI();
-            const actions = inject("@action");
+            const actions = inject("@actions");
             const memo = inject("@memo");
 
             function debugLog(...v){
@@ -357,7 +357,13 @@
             context.provide("$_nav", ref(false));
             context.provide("$_loading", ref(false));
             context.provide("$_notifies", reactive([]));
-            context.provide("@action", reactive([...new Array(10)].map(() => ({name: "", _edit: false}))));
+
+            const struct_action = {
+                name: "",
+                _edit: false
+            };
+
+            context.provide("@actions", reactive([...new Array(10)].map(() => structuredClone(struct_action))));
             context.provide("@memo", ref(""));
         }
     };

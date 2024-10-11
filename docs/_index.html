@@ -284,86 +284,100 @@
         }
     });
 
-    const pages_sub = defineComponent({
+    const pages_graph = defineComponent({
         template: /*html*/`
             <v-container fluid>
-                <v-row justify="center">
-                    <v-col cols>
-                        <v-card>
-                            <v-card-item>
-                                <v-card-title class="text-center">{{countx}}</v-card-title>
-                            </v-card-item>
-
-                            <v-card-actions class="justify-center">
-                                <x-reflect>
-                                    <v-btn color="orange-darken-1" variant="flat" @click="resetx()">ResetX</v-btn>
-                                </x-reflect>
-                                <x-reflect>
-                                    <v-btn color="teal-darken-1" variant="flat" @click="delayresetx()">DelayResetX</v-btn>
-                                </x-reflect>
-                            </v-card-actions>
-                        </v-card>
+                <v-row no-gutters justify="center">
+                    <v-col cols sm="8" md="4">
+                        <v-row>
+                            <v-col cols>
+                                <v-card>
+                                    <v-card-title>グラフ</v-card-title>
+                                </v-card>
+                            </v-col>
+                        </v-row>
                     </v-col>
                 </v-row>
             </v-container>
-        `,
-        setup() {
-            const {toggleLoading, pushNotify} = useCommonUI();
-
-            /** @type {Ref<number>} */
-            const countx = inject("$count");
-
-            function resetx() {
-                countx.value = 0;
-                pushNotify("ResetX!", "orange-darken-1");
-            }
-
-            async function delayresetx() {
-                toggleLoading(true);
-                await new Promise(done => setTimeout(done, 1000));
-                countx.value = 0;
-                toggleLoading(false);
-                pushNotify("ResetDelayX!", "teal-darken-1");
-            }
-
-            return {countx, resetx, delayresetx};
-        }
+        `
     });
 
-    const pages_third = defineComponent({
+    const pages_config = defineComponent({
         template: /*html*/`
-            <v-img :height="height" class="text-center align-center text-white" gradient="45deg, #FF9F17, #FF4E0E">
-                <div v-if="mobile" class="text-h4">MOBILE</div>
-                <div v-else class="text-h2">DESKTOP</div>
-            </v-img>
-        `,
-        setup() {
-            const display = useDisplay();
-            const layout = useLayout();
+            <v-container fluid>
+                <v-row no-gutters justify="center">
+                    <v-col cols sm="8" md="4">
+                        <v-row>
+                            <v-col cols>
+                                <v-card>
+                                    <v-card-title>設定</v-card-title>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-col>
+                </v-row>
+            </v-container>
+        `
+    });
 
-            /** @type {Ref<boolean>} */
-            const mobile = computed(() => display.mobile.value);
-            /** @type {Ref<number>} */
-            const height = computed(() => display.height.value - layout.mainRect.value.top - layout.mainRect.value.bottom);
+    const pages_backup = defineComponent({
+        template: /*html*/`
+            <v-container fluid>
+                <v-row no-gutters justify="center">
+                    <v-col cols sm="8" md="4">
+                        <v-row>
+                            <v-col cols>
+                                <v-card>
+                                    <v-card-title>データバックアップ</v-card-title>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-col>
+                </v-row>
+            </v-container>
+        `
+    });
 
-            return {mobile, height};
-        }
+    const pages_about = defineComponent({
+        template: /*html*/`
+            <v-container fluid>
+                <v-row no-gutters justify="center">
+                    <v-col cols sm="8" md="4">
+                        <v-row>
+                            <v-col cols>
+                                <v-card>
+                                    <v-card-title>このアプリについて</v-card-title>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-col>
+                </v-row>
+            </v-container>
+        `
     });
 
     const router = createRouter({
         history: createWebHashHistory(),
         routes: [{
             path: "/",
-            name: "home",
+            name: "ホーム",
             component: pages_index
         }, {
-            path: "/sub",
-            name: "sub",
-            component: pages_sub
+            path: "/graph",
+            name: "グラフ",
+            component: pages_graph
         }, {
-            path: "/third",
-            name: "third",
-            component: pages_third
+            path: "/config",
+            name: "設定",
+            component: pages_config
+        }, {
+            path: "/backup",
+            name: "データバックアップ",
+            component: pages_backup
+        }, {
+            path: "/about",
+            name: "このアプリについて",
+            component: pages_about
         }, {
             path: "/:catchAll(.*)",
             redirect: "/"

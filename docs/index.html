@@ -11,7 +11,7 @@
     import {createRouter, createWebHashHistory, useRouter} from "https://esm.sh/vue-router@4.4.4/dist/vue-router.esm-bundler.js?target=esnext";
     import {createVuetify, useDisplay, useLayout, useTheme} from "https://esm.sh/vuetify@3.7.2/dist/vuetify.esm.js?target=esnext";
 
-    import {Chart} from "https://esm.sh/chart.js@4.4.4/auto?target=esnext";
+    import {Chart} from "https://esm.sh/chart.js@4.4.6/auto?target=esnext";
     import {default as confetti} from "https://esm.sh/canvas-confetti@1.9.3?target=esnext";
 
     /**
@@ -209,9 +209,9 @@
             * @return {void}
             */
             async function notifyTimeout(notify, ms) {
-                await new Promise(done => setTimeout(done, ms));
+                await new Promise((done) => setTimeout(done, ms));
 
-                const i = notifies.findIndex(v => v === notify);
+                const i = notifies.findIndex((v) => v === notify);
 
                 if(i === -1) {
                     return;
@@ -286,22 +286,22 @@
                 </v-row>
             </v-container>
         `,
-        setup(){
+        setup() {
             const {pushNotify} = useCommonUI();
             const actions = inject("$actions");
             const memo = inject("$memo");
 
-            function debugLog(...v){
+            function debugLog(...v) {
                 confetti();
                 console.log(...v);
                 pushNotify("Console Log", "green");
             }
 
-            function perf(){
+            function perf() {
                 console.log(actions);
             }
 
-            function registEntry(){
+            function registEntry() {
                 pushNotify("dummy", "green");
             }
 

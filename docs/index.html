@@ -9,7 +9,7 @@
 <script async type="module">
     import {createApp, defineComponent, ref, reactive, inject, computed} from "https://esm.sh/vue@3.5.13/dist/vue.esm-bundler.js?target=esnext";
     import {createRouter, createWebHashHistory, useRouter} from "https://esm.sh/vue-router@4.5.0/dist/vue-router.esm-bundler.js?target=esnext";
-    import {createVuetify, useDisplay, useLayout, useTheme} from "https://esm.sh/vuetify@3.7.5/dist/vuetify.esm.js?target=esnext";
+    import {createVuetify, useDisplay, useLayout, useTheme} from "https://esm.sh/vuetify@3.7.19/dist/vuetify.esm.js?target=esnext";
 
     import {Chart} from "https://esm.sh/chart.js@4.4.7/auto?target=esnext";
     import {default as confetti} from "https://esm.sh/canvas-confetti@1.9.3?target=esnext";
@@ -152,7 +152,7 @@
 
                 const i = notifies.findIndex((v) => v === notify);
 
-                if(i === -1) {
+                if (i === -1) {
                     return;
                 }
 
@@ -184,7 +184,7 @@
         setup() {
             const actions = inject("$actions");
 
-            for(let i = 0; i < 10; i++) {
+            for (let i = 0; i < 10; i++) {
                 actions.push({
                     name: "",
                     _edit: false
@@ -386,16 +386,13 @@
 </script>
 
 <style>
-    @import "https://esm.sh/vuetify@3.7.5/dist/vuetify.css";
+    @import "https://esm.sh/vuetify@3.7.19/dist/vuetify.css";
     @import "https://esm.sh/@mdi/font@7.4.47/css/materialdesignicons.css";
     @import "https://fonts.googleapis.com/css?family=M+PLUS+1+Code:wght@100;200;300;400;500;600;700";
 
-    ::-webkit-scrollbar {
-        display: none !important;
-    }
-
     * {
         font-family: "M PLUS 1 Code" !important;
+        scrollbar-width: none !important;
     }
 </style>
 

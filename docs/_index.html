@@ -107,28 +107,6 @@
         return {toasts, loading, pushToast, toggleLoading};
     }
 
-    function vueUseCount() {
-        const {pushToast, toggleLoading} = vueUseDialog();
-
-        /** @type {Ref<number>} */
-        const count = _inject("count");
-
-        function increment() {
-            count.value++;
-            pushToast("green", "IncrementX!");
-        }
-
-        async function decrement() {
-            toggleLoading(true);
-            await new Promise((done) => setTimeout(done, 200));
-            count.value--;
-            toggleLoading(false);
-            pushToast("orange-darken-1", "DecrementX!");
-        }
-
-        return {count, increment, decrement};
-    }
-
     const vueApplication = _defineComponent({
         template: /*html*/`
             <v-app>
@@ -138,7 +116,6 @@
                 <v-main>
                     <router-view></router-view>
                 </v-main>
-                <x-footer></x-footer>
             </v-app>
         `,
         components: {
@@ -211,17 +188,11 @@
 
                     return {nav, toggleDark};
                 }
-            }),
-            "x-footer": _defineComponent({
-                template: /*html*/`
-                    <v-footer app class="justify-center align-center">Copyright</v-footer>
-                `
             })
         },
         setup() {
             _provide("toasts", _ref([]));
             _provide("loading", _ref(false));
-            _provide("count", _ref(0));
         }
     });
 
@@ -237,28 +208,20 @@
                                 <v-card width="400">
                                     <v-card-item>
                                         <v-card-title>Name: {{text || "(blank)"}}</v-card-title>
-                                        <v-card-subtitle>Count: {{count}}</v-card-subtitle>
                                     </v-card-item>
 
                                     <v-card-text>
                                         <v-text-field variant="underlined" color="blue" label="Name" v-model="text"></v-text-field>
                                     </v-card-text>
-
-                                    <v-card-actions class="justify-center">
-                                        <v-btn variant="flat" color="green" @click="increment();">Increment</v-btn>
-                                        <v-btn variant="flat" color="orange-darken-1" @click="decrement();">Decrement</v-btn>
-                                    </v-card-actions>
                                 </v-card>
                             </v-col>
                         </v-row>
                     </v-container>
                 `,
                 setup() {
-                    const {count, increment, decrement} = vueUseCount();
-
                     const text = _ref("");
 
-                    return {count, text, increment, decrement};
+                    return {text};
                 }
             })
         }, {

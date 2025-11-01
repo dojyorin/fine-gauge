@@ -63,6 +63,24 @@
     /** @type {() => Theme} */
     const _useTheme = useTheme;
 
+    import {Chart} from "https://esm.sh/chart.js@4.5.1/auto?target=esnext";
+
+    /**
+     * @typedef {{type: string; data: {datasets: {data: unknown[]; label?: string; backgroundColor?: string;}[]; labels?: string[];}; options?: {plugins?: {title?: {display?: boolean; text?: string;}; tooltip?: {callbacks?: {afterLabel?(): string | string[] | void;};};};} & BarOption;}} Option
+     */
+
+    /**
+     * @typedef {{scales?: {y?: {ticks?: {stepSize?: number; precision?: number;};};};}} BarOption
+     */
+
+    /** @type {new (target: HTMLCanvasElement | OffscreenCanvas, option: Option) => {clear(): void; update(): void;} & Omit<Option, "type">} */
+    const _Chart = Chart;
+
+    import {default as confetti} from "https://esm.sh/canvas-confetti@1.9.4?target=esnext";
+
+    /** @type {(option?: {angle?: number; origin?: {x?: number; y?: number;};}) => Promise<void>} */
+    const _confetti = confetti;
+
     function vueUseDialog() {
         /** @type {Ref<{color: string; text: string;}[]>} */
         const toasts = _inject("toasts");

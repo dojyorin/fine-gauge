@@ -1,0 +1,307 @@
+<!doctype html>
+<meta charset="utf-8">
+
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="height=device-height, width=device-width, minimum-scale=1, maximum-scale=1, initial-scale=1, user-scalable=no">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50%' y='50%' style='dominant-baseline: central; text-anchor: middle; font-size: 100px;'>🌌</text></svg>">
+
+<script async type="module">
+    import {createApp, defineComponent, ref, provide, inject} from "https://esm.sh/vue@3/dist/vue.esm-bundler.js?target=esnext";
+    import {createRouter, createWebHashHistory} from "https://esm.sh/vue-router@4/dist/vue-router.esm-bundler.js?target=esnext";
+    import {createVuetify, useTheme} from "https://esm.sh/vuetify@3/dist/vuetify.esm.js?target=esnext";
+
+    /**
+     * @typedef {{mount(target: Element): void; use(plugin: Plugin): void;}} Vue
+     */
+
+    /**
+     * @typedef {{install(context: Vue): void;}} Plugin
+     */
+
+    /**
+     * @typedef {{template: string; setup?(): Record<string, unknown> | void; components?: Record<string, Component>;}} Component
+     */
+
+    /**
+     * @template T
+     * @typedef {{value: T;}} Ref
+     */
+
+    /**
+     * @typedef {Plugin & {push(path: string): void; beforeEach(func: (to: Route, from: Route, next: () => void) => Promise<void | boolean | string>): void;}} Router
+     */
+
+    /**
+     * @typedef {{path: string; hash: string; query: Record<string, string>; params: Record<string, string>; name?: string; meta?: Record<string, unknown>;}} Route
+     */
+
+    /**
+     * @typedef {Plugin & {theme: Theme;}} Vuetify
+     */
+
+    /**
+     * @typedef {{global: {name: Ref<string>;};}} Theme
+     */
+
+    /** @type {(component: Component) => Vue} */
+    const _createApp = createApp;
+    /** @type {(component: Component) => Component} */
+    const _defineComponent = defineComponent;
+    /** @type {<T>(value: T) => Ref<T>} */
+    const _ref = ref;
+    /** @type {<T>(key: string, value: T) => void} */
+    const _provide = provide;
+    /** @type {<T>(key: string) => T} */
+    const _inject = inject;
+    /** @type {(option: {history: Record<string, unknown>; routes: {path: string; name?: string; component?: Component;}[];}) => Router} */
+    const _createRouter = createRouter;
+    /** @type {() => Record<string, unknown>} */
+    const _createWebHashHistory = createWebHashHistory;
+    /** @type {(option: {defaults: Record<string, {style: Record<string, string | number>;}>;}) => Vuetify} */
+    const _createVuetify = createVuetify;
+    /** @type {() => Theme} */
+    const _useTheme = useTheme;
+
+    function vueUseDialog() {
+        /** @type {Ref<{color: string; text: string;}[]>} */
+        const toasts = _inject("toasts");
+        /** @type {Ref<boolean>} */
+        const loading = _inject("loading");
+
+        /**
+         * @param {string} color
+         * @param {string} text
+         * @return {void}
+         */
+        function pushToast(color, text) {
+            toasts.value.push({color, text});
+        }
+
+        /**
+         * @param {boolean} [state]
+         * @return {void}
+         */
+        function toggleLoading(state) {
+            loading.value = state ?? !loading.value;
+        }
+
+        return {toasts, loading, pushToast, toggleLoading};
+    }
+
+    function vueUseCount() {
+        const {pushToast, toggleLoading} = vueUseDialog();
+
+        /** @type {Ref<number>} */
+        const count = _inject("count");
+
+        function increment() {
+            count.value++;
+            pushToast("green", "IncrementX!");
+        }
+
+        async function decrement() {
+            toggleLoading(true);
+            await new Promise((done) => setTimeout(done, 200));
+            count.value--;
+            toggleLoading(false);
+            pushToast("orange-darken-1", "DecrementX!");
+        }
+
+        return {count, increment, decrement};
+    }
+
+    const vueApplication = _defineComponent({
+        template: /*html*/`
+            <v-app>
+                <x-toast></x-toast>
+                <x-loading></x-loading>
+                <x-header></x-header>
+                <v-main>
+                    <router-view></router-view>
+                </v-main>
+                <x-footer></x-footer>
+            </v-app>
+        `,
+        components: {
+            "x-toast": _defineComponent({
+                template: /*html*/`
+                    <v-snackbar-queue closable location="top right" timeout="5000" v-model="toasts">
+                        <template #actions="{props}">
+                            <v-btn :="props" density="compact" icon="mdi-close"></v-btn>
+                        </template>
+                    </v-snackbar-queue>
+                `,
+                setup() {
+                    const {toasts} = vueUseDialog();
+
+                    return {toasts};
+                }
+            }),
+            "x-loading": _defineComponent({
+                template: /*html*/`
+                    <v-overlay persistent no-click-animation class="justify-center align-center" v-model="loading">
+                        <v-progress-circular indeterminate size="60" width="4" color="primary"></v-progress-circular>
+                    </v-overlay>
+                `,
+                setup() {
+                    const {loading} = vueUseDialog();
+
+                    return {loading};
+                }
+            }),
+            "x-header": _defineComponent({
+                template: /*html*/`
+                    <v-app-bar theme="dark" density="compact">
+                        <template #prepend>
+                            <v-app-bar-nav-icon @click="nav = !nav;"></v-app-bar-nav-icon>
+                        </template>
+
+                        <template #append>
+                            <v-btn icon="mdi-theme-light-dark" @click="toggleDark();"></v-btn>
+                        </template>
+
+                        <template #image>
+                            <v-img gradient="45deg, #174AFF, #0ECDFF"></v-img>
+                        </template>
+
+                        <v-app-bar-title>
+                            <router-link class="text-decoration-none text-high-emphasis" to="/">Application</router-link>
+                        </v-app-bar-title>
+                    </v-app-bar>
+
+                    <v-navigation-drawer floating temporary v-model="nav">
+                        <v-list nav density="compact">
+                            <v-list-item to="/">
+                                <v-list-item-title>Top</v-list-item-title>
+                            </v-list-item>
+
+                            <v-list-item to="/sub">
+                                <v-list-item-title>Sub</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-navigation-drawer>
+                `,
+                setup() {
+                    const theme = _useTheme();
+
+                    const nav = _ref(false);
+
+                    function toggleDark() {
+                        theme.global.name.value = theme.global.name.value === "dark" ? "light" : "dark";
+                    }
+
+                    return {nav, toggleDark};
+                }
+            }),
+            "x-footer": _defineComponent({
+                template: /*html*/`
+                    <v-footer app class="justify-center align-center">Copyright</v-footer>
+                `
+            })
+        },
+        setup() {
+            _provide("toasts", _ref([]));
+            _provide("loading", _ref(false));
+            _provide("count", _ref(0));
+        }
+    });
+
+    const vueRouter = _createRouter({
+        history: _createWebHashHistory(),
+        routes: [{
+            path: "/",
+            component: _defineComponent({
+                template: /*html*/`
+                    <v-container fluid>
+                        <v-row justify="center">
+                            <v-col cols="auto">
+                                <v-card width="400">
+                                    <v-card-item>
+                                        <v-card-title>Name: {{text || "(blank)"}}</v-card-title>
+                                        <v-card-subtitle>Count: {{count}}</v-card-subtitle>
+                                    </v-card-item>
+
+                                    <v-card-text>
+                                        <v-text-field variant="underlined" color="blue" label="Name" v-model="text"></v-text-field>
+                                    </v-card-text>
+
+                                    <v-card-actions class="justify-center">
+                                        <v-btn variant="flat" color="green" @click="increment();">Increment</v-btn>
+                                        <v-btn variant="flat" color="orange-darken-1" @click="decrement();">Decrement</v-btn>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                `,
+                setup() {
+                    const {count, increment, decrement} = vueUseCount();
+
+                    const text = _ref("");
+
+                    return {count, text, increment, decrement};
+                }
+            })
+        }, {
+            path: "/sub",
+            component: _defineComponent({
+                template: /*html*/`
+                    <v-img gradient="45deg, #FF9F17, #FF4E0E" class="fill-height text-center align-center text-white text-h2">
+                        <div class="hidden-md-and-up">MOBILE</div>
+                        <div class="hidden-sm-and-down">DESKTOP</div>
+                    </v-img>
+                `
+            })
+        }, {
+            path: "/:catchAll(.*)",
+            component: _defineComponent({
+                template: /*html*/`
+                    <v-container fluid class="justify-center fill-height">
+                        <v-card flat color="transparent">
+                            <v-card-item class="justify-center">
+                                <v-card-title class="text-h3">🥺Not Found🥺</v-card-title>
+                            </v-card-item>
+
+                            <v-card-actions class="justify-center">
+                                <v-btn to="/" class="text-h6">Back to Top</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-container>
+                `
+            })
+        }]
+    });
+
+    const vueVuetify = _createVuetify({
+        defaults: {
+            VBtn: {
+                style: {
+                    "text-transform": "none",
+                    "letter-spacing": "normal",
+                    "text-indent": 0
+                }
+            }
+        }
+    });
+
+    const vue = _createApp(vueApplication);
+    vue.use(vueRouter);
+    vue.use(vueVuetify);
+    vue.mount(document.getElementById("vue"));
+</script>
+
+<style>
+    @import "https://esm.sh/vuetify@3/dist/vuetify.css";
+    @import "https://esm.sh/@mdi/font@7.4.47/css/materialdesignicons.css";
+    @import "https://fonts.googleapis.com/css?family=M+PLUS+1+Code:wght@100;200;300;400;500;600;700";
+
+    * {
+        font-family: "M PLUS 1 Code" !important;
+        scrollbar-width: none !important;
+    }
+</style>
+
+<title>Application</title>
+
+<div id="vue"></div>

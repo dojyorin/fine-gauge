@@ -214,22 +214,34 @@
                         </template>
 
                         <template #image>
-                            <v-img gradient="45deg, #174AFF, #0ECDFF"></v-img>
+                            <v-img gradient="45deg, #10B5B2, #22E6B5"></v-img>
                         </template>
 
                         <v-app-bar-title>
-                            <router-link class="text-decoration-none text-high-emphasis" to="/">Application</router-link>
+                            <router-link class="text-decoration-none text-high-emphasis" to="/">元気ゲージ</router-link>
                         </v-app-bar-title>
                     </v-app-bar>
 
                     <v-navigation-drawer floating temporary v-model="nav">
                         <v-list nav density="compact">
                             <v-list-item to="/">
-                                <v-list-item-title>Top</v-list-item-title>
+                                <v-list-item-title>ホーム</v-list-item-title>
                             </v-list-item>
 
-                            <v-list-item to="/sub">
-                                <v-list-item-title>Sub</v-list-item-title>
+                            <v-list-item to="/regist">
+                                <v-list-item-title>登録</v-list-item-title>
+                            </v-list-item>
+
+                            <v-list-item to="/statistic">
+                                <v-list-item-title>統計</v-list-item-title>
+                            </v-list-item>
+
+                            <v-list-item to="/configure">
+                                <v-list-item-title>設定</v-list-item-title>
+                            </v-list-item>
+
+                            <v-list-item to="/about">
+                                <v-list-item-title>このアプリについて</v-list-item-title>
                             </v-list-item>
                         </v-list>
                     </v-navigation-drawer>
@@ -343,6 +355,6 @@
     }
 </style>
 
-<title>Application</title>
+<title>元気ゲージ</title>
 
 <div id="vue"></div>

@@ -81,6 +81,63 @@
     /** @type {(option?: {angle?: number; origin?: {x?: number; y?: number;};}) => Promise<void>} */
     const _confetti = confetti;
 
+    /**
+     * @template {Record<string, unknown> | unknown[]} T
+     * @param {"local" | "session"} type
+     * @param {string} key
+     * @param {T} value
+     * @return {T}
+     */
+    function createStorage(type, key, value) {
+        /**
+         * @template {unknown} U
+         * @param {U} input
+         * @return {U}
+         */
+        function createProxy(input) {
+            if (typeof input !== "object" || input === null) {
+                return input;
+            }
+
+            return new Proxy(input, {
+                get(t, p) {
+                    const a = Reflect.get(t, p);
+
+                    return createProxy(a);
+                },
+                set(t, p, v) {
+                    const a = Reflect.set(t, p, v);
+
+                    if (a) {
+                        storage.setItem(key, JSON.stringify(body));
+                    }
+
+                    return a;
+                },
+                deleteProperty(t, p) {
+                    const a = Reflect.deleteProperty(t, p);
+
+                    if (a) {
+                        storage.setItem(key, JSON.stringify(body));
+                    }
+
+                    return a;
+                }
+            });
+        }
+
+        const storage = type === "local" ? localStorage : sessionStorage;
+        const source = storage.getItem(key);
+        /** @type {T} */
+        const body = source ? JSON.parse(source) : structuredClone(value);
+
+        if (!source) {
+            storage.setItem(key, JSON.stringify(body));
+        }
+
+        return createProxy(body);
+    }
+
     function vueUseDialog() {
         /** @type {Ref<{color: string; text: string;}[]>} */
         const toasts = _inject("toasts");

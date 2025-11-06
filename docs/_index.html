@@ -294,13 +294,143 @@
                 }
             })
         }, {
-            path: "/sub",
+            path: "/regist",
             component: _defineComponent({
                 template: /*html*/`
-                    <v-img gradient="45deg, #FF9F17, #FF4E0E" class="fill-height text-center align-center text-white text-h2">
-                        <div class="hidden-md-and-up">MOBILE</div>
-                        <div class="hidden-sm-and-down">DESKTOP</div>
-                    </v-img>
+                    <v-container fluid>
+                        <v-row no-gutters justify="center">
+                            <v-col cols sm="8" md="4">
+                                <v-list>
+                                    <template v-for="(action, i) in actions">
+                                        <v-divider v-if="i"></v-divider>
+                                        <v-list-item @click="">
+                                            <v-list-title v-if="!action._edit">{{action.name}}</v-list-title>
+                                            <v-text-field v-else single-line clearable variant="underlined" @keyup.enter="action._edit = false;" v-model="action.name"></v-text-field>
+
+                                            <template #append>
+                                                <template v-if="action._edit">
+                                                    <div class="d-flex flex-column">
+                                                        <v-btn flat density="comfortable" icon="mdi-menu-up-outline" :style="{'visibility': i === 0 ? 'hidden' : 'revert'}" @click="actions.splice(i - 1, 2, actions[i], actions[i - 1]);"></v-btn>
+                                                        <v-btn flat density="comfortable" icon="mdi-menu-down-outline" :style="{'visibility': i + 1 === actions.length ? 'hidden' : 'revert'}" @click="actions.splice(i, 2, actions[i + 1], actions[i]);"></v-btn>
+                                                    </div>
+
+                                                    <v-btn flat density="comfortable" icon="mdi-delete" @click="actions.splice(i, 1);"></v-btn>
+                                                    <v-btn flat density="comfortable" icon="mdi-text-box-check-outline" :disabled="!action.name" @click="action._edit = false;"></v-btn>
+                                                </template>
+
+                                                <v-btn v-else flat density="comfortable" icon="mdi-text-box-edit-outline" @click="action._edit = true;"></v-btn>
+                                            </template>
+                                        </v-list-item>
+                                    </template>
+
+                                    <v-divider></v-divider>
+
+                                    <v-list-item>
+                                        <v-text-field single-line clearable variant="underlined" @keyup.enter="pushAction();" v-model="newActionName"></v-text-field>
+
+                                        <template #append>
+                                            <v-btn flat density="comfortable" icon="mdi-text-box-plus-outline" :disabled="!newActionName" @click="pushAction();"></v-btn>
+                                        </template>
+                                    </v-list-item>
+                                </v-list>
+
+                                <v-textarea placeholder="メモ帳" v-model="memo"></v-textarea>
+
+                                <v-btn color="green" @click="registEntry()">登録</v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                `,
+                setup() {
+                    const {pushToast} = vueUseDialog();
+
+                    /** @typedef {{name: string; _edit: boolean;}} Action */
+
+                    /** @type {Ref<Action[]>} */
+                    const actions = _ref([]);
+                    const newActionName = _ref("");
+                    const memo = _ref("");
+
+                    actions.value.push({
+                        name: "test",
+                        _edit: false
+                    }, {
+                        name: "test",
+                        _edit: false
+                    });
+
+                    function pushAction() {
+                        actions.value.push({
+                            name: newActionName.value,
+                            _edit: false
+                        });
+
+                        newActionName.value = "";
+                    }
+
+                    function registEntry() {
+                        pushToast("green", "dummy");
+                        _confetti();
+                    }
+
+                    return {actions, memo, newActionName, registEntry, pushAction};
+                }
+            })
+        }, {
+            path: "/statistic",
+            component: _defineComponent({
+                template: /*html*/`
+                    <v-container fluid>
+                        <v-row no-gutters justify="center">
+                            <v-col cols sm="8" md="4">
+                                <v-row>
+                                    <v-col cols>
+                                        <v-card>
+                                            <v-card-title>統計</v-card-title>
+                                        </v-card>
+                                    </v-col>
+                                </v-row>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                `
+            })
+        }, {
+            path: "/configure",
+            component: _defineComponent({
+                template: /*html*/`
+                    <v-container fluid>
+                        <v-row no-gutters justify="center">
+                            <v-col cols sm="8" md="4">
+                                <v-row>
+                                    <v-col cols>
+                                        <v-card>
+                                            <v-card-title>設定</v-card-title>
+                                        </v-card>
+                                    </v-col>
+                                </v-row>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                `
+            })
+        }, {
+            path: "/about",
+            component: _defineComponent({
+                template: /*html*/`
+                    <v-container fluid>
+                        <v-row no-gutters justify="center">
+                            <v-col cols sm="8" md="4">
+                                <v-row>
+                                    <v-col cols>
+                                        <v-card>
+                                            <v-card-title>このアプリについて</v-card-title>
+                                        </v-card>
+                                    </v-col>
+                                </v-row>
+                            </v-col>
+                        </v-row>
+                    </v-container>
                 `
             })
         }, {

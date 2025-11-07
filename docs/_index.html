@@ -301,50 +301,56 @@
             path: "/regist",
             component: _defineComponent({
                 template: /*html*/`
-                    <v-container fluid>
-                        <v-row no-gutters justify="center">
-                            <v-col cols sm="8" md="4">
-                                <v-list>
-                                    <template v-for="(action, i) in actions">
-                                        <v-divider v-if="i"></v-divider>
-                                        <v-list-item @click="">
-                                            <v-list-title v-if="!action._edit">{{action.name}}</v-list-title>
-                                            <v-text-field v-else single-line clearable variant="underlined" @keyup.enter="action._edit = false;" v-model="action.name"></v-text-field>
+                    <v-container style="max-width: 600px;">
+                        <v-row dense justify="center">
+                            <v-col cols="12">
+                                <v-card>
+                                    <v-list>
+                                        <v-list-item v-if="!actions.length">
+                                            <v-list-title>(アクションがありません)</v-list-title>
+                                        </v-list-item>
+
+                                        <template v-for="(action, i) in actions">
+                                            <v-divider v-if="i"></v-divider>
+                                            <v-list-item @click="">
+                                                <v-list-title v-if="!action._edit">{{action.name}}</v-list-title>
+                                                <v-text-field v-else single-line clearable variant="underlined" @keyup.enter="action._edit = false;" v-model="action.name"></v-text-field>
+
+                                                <template #append>
+                                                    <template v-if="action._edit">
+                                                        <div class="d-flex flex-column">
+                                                            <v-btn flat density="comfortable" icon="mdi-menu-up-outline" :style="{'visibility': i === 0 ? 'hidden' : 'revert'}" @click="actions.splice(i - 1, 2, actions[i], actions[i - 1]);"></v-btn>
+                                                            <v-btn flat density="comfortable" icon="mdi-menu-down-outline" :style="{'visibility': i + 1 === actions.length ? 'hidden' : 'revert'}" @click="actions.splice(i, 2, actions[i + 1], actions[i]);"></v-btn>
+                                                        </div>
+
+                                                        <v-btn flat density="comfortable" icon="mdi-delete" @click="actions.splice(i, 1);"></v-btn>
+                                                        <v-btn flat density="comfortable" icon="mdi-text-box-check-outline" :disabled="!action.name" @click="action._edit = false;"></v-btn>
+                                                    </template>
+
+                                                    <v-btn v-else flat density="comfortable" icon="mdi-text-box-edit-outline" @click="action._edit = true;"></v-btn>
+                                                </template>
+                                            </v-list-item>
+                                        </template>
+
+                                        <v-divider></v-divider>
+
+                                        <v-list-item>
+                                            <v-text-field single-line clearable variant="underlined" placeholder="項目" v-model="newActionName"></v-text-field>
 
                                             <template #append>
-                                                <template v-if="action._edit">
-                                                    <div class="d-flex flex-column">
-                                                        <v-btn flat density="comfortable" icon="mdi-menu-up-outline" :style="{'visibility': i === 0 ? 'hidden' : 'revert'}" @click="actions.splice(i - 1, 2, actions[i], actions[i - 1]);"></v-btn>
-                                                        <v-btn flat density="comfortable" icon="mdi-menu-down-outline" :style="{'visibility': i + 1 === actions.length ? 'hidden' : 'revert'}" @click="actions.splice(i, 2, actions[i + 1], actions[i]);"></v-btn>
-                                                    </div>
-
-                                                    <v-btn flat density="comfortable" icon="mdi-delete" @click="actions.splice(i, 1);"></v-btn>
-                                                    <v-btn flat density="comfortable" icon="mdi-text-box-check-outline" :disabled="!action.name" @click="action._edit = false;"></v-btn>
-                                                </template>
-
-                                                <v-btn v-else flat density="comfortable" icon="mdi-text-box-edit-outline" @click="action._edit = true;"></v-btn>
+                                                <v-btn flat density="comfortable" icon="mdi-text-box-plus-outline" :disabled="!newActionName" @click="pushAction();"></v-btn>
                                             </template>
                                         </v-list-item>
-                                    </template>
+                                    </v-list>
+                                </v-card>
+                            </v-col>
 
-                                    <v-divider></v-divider>
-
-                                    <v-list-item>
-                                        <v-text-field single-line clearable variant="underlined" placeholder="項目" v-model="newActionName"></v-text-field>
-
-                                        <template #append>
-                                            <v-btn flat density="comfortable" icon="mdi-text-box-plus-outline" :disabled="!newActionName" @click="pushAction();"></v-btn>
-                                        </template>
-                                    </v-list-item>
-
-                                    <v-list-item>
+                            <v-col cols="12">
+                                <v-card>
+                                    <v-card-item>
                                         <v-textarea clearable variant="underlined" placeholder="メモ帳" v-model="memo"></v-textarea>
-
-                                        <template #append>
-                                            <v-btn flat density="comfortable" icon="mdi-text-box-check-outline" :disabled="!memo" @click="saveMemo();"></v-btn>
-                                        </template>
-                                    </v-list-item>
-                                </v-list>
+                                    </v-card-item>
+                                </v-card>
                             </v-col>
                         </v-row>
                     </v-container>

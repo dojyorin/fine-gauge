@@ -330,17 +330,21 @@
                                     <v-divider></v-divider>
 
                                     <v-list-item>
-                                        <v-text-field single-line clearable variant="underlined" @keyup.enter="pushAction();" v-model="newActionName"></v-text-field>
+                                        <v-text-field single-line clearable variant="underlined" placeholder="項目" v-model="newActionName"></v-text-field>
 
                                         <template #append>
                                             <v-btn flat density="comfortable" icon="mdi-text-box-plus-outline" :disabled="!newActionName" @click="pushAction();"></v-btn>
                                         </template>
                                     </v-list-item>
+
+                                    <v-list-item>
+                                        <v-textarea clearable variant="underlined" placeholder="メモ帳" v-model="memo"></v-textarea>
+
+                                        <template #append>
+                                            <v-btn flat density="comfortable" icon="mdi-text-box-check-outline" :disabled="!memo" @click="saveMemo();"></v-btn>
+                                        </template>
+                                    </v-list-item>
                                 </v-list>
-
-                                <v-textarea placeholder="メモ帳" v-model="memo"></v-textarea>
-
-                                <v-btn color="green" @click="registEntry()">登録</v-btn>
                             </v-col>
                         </v-row>
                     </v-container>
@@ -377,7 +381,11 @@
                         _confetti();
                     }
 
-                    return {actions, memo, newActionName, registEntry, pushAction};
+                    function saveMemo() {
+                        memo.value;
+                    }
+
+                    return {actions, memo, newActionName, pushAction, registEntry, saveMemo};
                 }
             })
         }, {

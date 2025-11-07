@@ -313,7 +313,8 @@
 
                                             <template v-for="(action, i) in actions">
                                                 <v-divider v-if="i"></v-divider>
-                                                <v-list-item @click="">
+
+                                                <v-list-item @click="saveAction(action);">
                                                     <v-list-title v-if="!action._edit">{{action.name}}</v-list-title>
                                                     <v-text-field v-else single-line clearable variant="underlined" @keyup.enter="action._edit = false;" v-model="action.name"></v-text-field>
 
@@ -384,16 +385,22 @@
                         newActionName.value = "";
                     }
 
-                    function registEntry() {
+                    /**
+                    * @param {Action} action
+                    * @return {void}
+                    */
+                    function saveAction(action) {
                         pushToast("green", "dummy");
                         _confetti();
+
+                        console.log(action);
                     }
 
                     function saveMemo() {
                         memo.value;
                     }
 
-                    return {actions, memo, newActionName, pushAction, registEntry, saveMemo};
+                    return {actions, memo, newActionName, pushAction, saveAction, saveMemo};
                 }
             })
         }, {

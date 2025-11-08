@@ -364,17 +364,9 @@
                     /** @typedef {{name: string; _edit: boolean;}} Action */
 
                     /** @type {Ref<Action[]>} */
-                    const actions = _ref([]);
+                    const actions = _ref(createStorage("session", "actions", []));
                     const newActionName = _ref("");
                     const memo = _ref("");
-
-                    actions.value.push({
-                        name: "test",
-                        _edit: false
-                    }, {
-                        name: "test",
-                        _edit: false
-                    });
 
                     function pushAction() {
                         actions.value.push({

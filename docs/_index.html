@@ -314,7 +314,7 @@
                                             <template v-for="(action, i) in actions">
                                                 <v-divider v-if="i"></v-divider>
 
-                                                <v-list-item @click="saveAction(action);">
+                                                <v-list-item @click.self="saveAction(action);">
                                                     <v-list-title v-if="!action._edit">{{action.name}}</v-list-title>
                                                     <v-text-field v-else single-line clearable variant="underlined" @keyup.enter="action._edit = false;" v-model="action.name"></v-text-field>
 
@@ -350,9 +350,9 @@
 
                             <v-col cols="12">
                                 <v-card>
-                                    <v-card-item>
+                                    <v-card-text>
                                         <v-textarea clearable variant="underlined" placeholder="メモ帳" v-model="memo"></v-textarea>
-                                    </v-card-item>
+                                    </v-card-text>
                                 </v-card>
                             </v-col>
                         </v-row>

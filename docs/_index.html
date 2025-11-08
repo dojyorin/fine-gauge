@@ -316,7 +316,7 @@
 
                                                 <v-list-item @click.self="saveAction(action);">
                                                     <v-list-title v-if="!action._edit">{{action.name}}</v-list-title>
-                                                    <v-text-field v-else single-line clearable variant="underlined" @keyup.enter="action._edit = false;" v-model="action.name"></v-text-field>
+                                                    <v-text-field v-else single-line hide-details clearable variant="underlined" @keyup.enter="action._edit = false;" v-model="action.name"></v-text-field>
 
                                                     <template #append>
                                                         <template v-if="action._edit">
@@ -337,7 +337,7 @@
                                             <v-divider></v-divider>
 
                                             <v-list-item>
-                                                <v-text-field single-line clearable variant="underlined" placeholder="項目" v-model="newActionName"></v-text-field>
+                                                <v-text-field single-line hide-details clearable variant="underlined" placeholder="項目" v-model="newActionName"></v-text-field>
 
                                                 <template #append>
                                                     <v-btn flat density="comfortable" icon="mdi-playlist-plus" :disabled="!newActionName" @click="pushAction();"></v-btn>
@@ -351,7 +351,7 @@
                             <v-col cols="12">
                                 <v-card>
                                     <v-card-text>
-                                        <v-textarea clearable variant="underlined" placeholder="メモ帳" v-model="memo"></v-textarea>
+                                        <v-textarea hide-details clearable variant="underlined" label="メモ帳" v-model="memo"></v-textarea>
                                     </v-card-text>
                                 </v-card>
                             </v-col>

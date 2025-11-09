@@ -339,7 +339,7 @@
                             <v-col cols="12">
                                 <v-card>
                                     <v-card-item>
-                                        <v-list>
+                                        <v-list selectable select-strategy="independent" v-model:selected="todayReport.actions">
                                             <v-list-item v-if="!actions.length">
                                                 <v-list-title>(アクションがありません)</v-list-title>
                                             </v-list-item>
@@ -347,7 +347,7 @@
                                             <template v-for="(action, i) in actions">
                                                 <v-divider v-if="i"></v-divider>
 
-                                                <v-list-item @click="toggleAction(action);">
+                                                <v-list-item :value="action">
                                                     <v-list-title v-if="!actions_edit[i]">{{action}}</v-list-title>
                                                     <v-text-field v-else single-line hide-details clearable variant="underlined" @keyup.enter="actions_edit[i] = false;" v-model="action"></v-text-field>
 
@@ -397,24 +397,6 @@
 
                     const actions_edit = _ref(Array.from({length: actions.value.length}, () => false));
                     const newAction = _ref("");
-
-                    /**
-                    * @param {string} action
-                    * @return {void}
-                    */
-                    function toggleAction(action) {
-                        if (todayReport.value.actions.includes(action)) {
-                            while (todayReport.value.actions.includes(action)) {
-                                todayReport.value.actions.splice(todayReport.value.actions.indexOf(action), 1);
-                            }
-
-                            pushToast("green", "解除しました");
-                        } else {
-                            todayReport.value.actions.push(action);
-                            _confetti();
-                            pushToast("green", "登録しました");
-                        }
-                    }
 
                     return {actions, reports, todayReport, actions_edit, newAction, toggleAction};
                 }

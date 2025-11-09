@@ -352,7 +352,7 @@
                                                     <v-text-field v-else single-line hide-details clearable variant="underlined" @keyup.enter="actions_edit[i] = false;" v-model="action"></v-text-field>
 
                                                     <template #prepend="{isSelected, select}">
-                                                        <v-checkbox hide-details :model-value="isSelected" @update:model-value="select"></v-checkbox>
+                                                        <v-checkbox v-if="!actions_edit[i]" hide-details :model-value="isSelected" @update:model-value="select"></v-checkbox>
                                                     </template>
 
                                                     <template #append>

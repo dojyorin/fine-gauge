@@ -397,12 +397,12 @@
                 `,
                 setup() {
                     const {pushToast} = vueUseDialog();
-                    const {actions, reports, todayReport} = vueUseReport();
+                    const {actions, todayReport} = vueUseReport();
 
                     const actions_edit = _ref(Array.from({length: actions.value.length}, () => false));
                     const newAction = _ref("");
 
-                    return {actions, reports, todayReport, actions_edit, newAction};
+                    return {actions, todayReport, actions_edit, newAction};
                 }
             })
         }, {

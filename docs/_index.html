@@ -142,6 +142,39 @@
         return createProxy(body);
     }
 
+    function vueUseReport() {
+        /** @type {Ref<string[]>} */
+        const actions = _ref(createStorage("session", "action", []));
+        /** @type {Ref<{date: string; actions: string[]; memo: string;}[]>} */
+        const reports = _ref(createStorage("session", "report", []));
+
+        const today = new Date().toLocaleDateString("sv-se");
+
+        if (!reports.value.some(({date}) => date === today)) {
+            reports.value.push({
+                date: today,
+                actions: [],
+                memo: ""
+            });
+        }
+
+        const maybe = reports.value.find(({date}) => date === today);
+
+        if (!maybe) {
+            throw new ReferenceError();
+        }
+
+        const todayReport = _ref(maybe);
+
+        for (const action of todayReport.value.actions) {
+            if (!actions.value.includes(action)) {
+                actions.value.push(action);
+            }
+        }
+
+        return {actions, reports, todayReport};
+    }
+
     function vueUseDialog() {
         /** @type {Ref<{color: string; text: string;}[]>} */
         const toasts = _inject("toasts");
@@ -314,7 +347,7 @@
                                             <template v-for="(action, i) in actions">
                                                 <v-divider v-if="i"></v-divider>
 
-                                                <v-list-item @click.self="saveAction(action);">
+                                                <v-list-item @click="toggleAction(action);">
                                                     <v-list-title v-if="!actions_edit[i]">{{action}}</v-list-title>
                                                     <v-text-field v-else single-line hide-details clearable variant="underlined" @keyup.enter="actions_edit[i] = false;" v-model="action"></v-text-field>
 
@@ -337,10 +370,10 @@
                                             <v-divider></v-divider>
 
                                             <v-list-item>
-                                                <v-text-field single-line hide-details clearable variant="underlined" placeholder="項目" v-model="newActionName"></v-text-field>
+                                                <v-text-field single-line hide-details clearable variant="underlined" placeholder="項目" v-model="newAction"></v-text-field>
 
                                                 <template #append>
-                                                    <v-btn flat density="comfortable" icon="mdi-playlist-plus" :disabled="!newActionName" @click="pushAction();"></v-btn>
+                                                    <v-btn flat density="comfortable" icon="mdi-playlist-plus" :disabled="!newAction || actions.includes(newAction)" @click="actions.push(newAction); newAction = '';"></v-btn>
                                                 </template>
                                             </v-list-item>
                                         </v-list>
@@ -351,7 +384,7 @@
                             <v-col cols="12">
                                 <v-card>
                                     <v-card-text>
-                                        <v-textarea hide-details clearable variant="underlined" label="メモ帳" v-model="memo"></v-textarea>
+                                        <v-textarea hide-details clearable variant="underlined" label="メモ帳" v-model="todayReport.memo"></v-textarea>
                                     </v-card-text>
                                 </v-card>
                             </v-col>
@@ -360,20 +393,10 @@
                 `,
                 setup() {
                     const {pushToast} = vueUseDialog();
-
-                    /** @type {Ref<{date: string; actions: string[]; memo: string;}[]>} */
-                    const reports = _ref(createStorage("session", "report", []));
-                    /** @type {Ref<string[]>} */
-                    const actions = _ref(createStorage("session", "action", []));
+                    const {actions, reports, todayReport} = vueUseReport();
 
                     const actions_edit = _ref(Array.from({length: actions.value.length}, () => false));
-                    const newActionName = _ref("");
-                    const memo = _ref("");
-
-                    function pushAction() {
-                        actions.value.push(newActionName.value);
-                        newActionName.value = "";
-                    }
+                    const newAction = _ref("");
 
                     /**
                     * @param {string} action
@@ -390,7 +413,7 @@
                         memo.value = "";
                     }
 
-                    return {actions, actions_edit, newActionName, memo, pushAction, saveAction, saveMemo};
+                    return {actions, reports, todayReport, actions_edit, newAction, isActive, toggleAction};
                 }
             })
         }, {

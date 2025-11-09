@@ -351,6 +351,10 @@
                                                     <v-list-title v-if="!actions_edit[i]">{{action}}</v-list-title>
                                                     <v-text-field v-else single-line hide-details clearable variant="underlined" @keyup.enter="actions_edit[i] = false;" v-model="action"></v-text-field>
 
+                                                    <template #prepend="{isSelected, select}">
+                                                        <v-checkbox hide-details :model-value="isSelected" @update:model-value="select"></v-checkbox>
+                                                    </template>
+
                                                     <template #append>
                                                         <template v-if="actions_edit[i]">
                                                             <div class="d-flex flex-column">

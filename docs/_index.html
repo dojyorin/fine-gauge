@@ -315,21 +315,21 @@
                                                 <v-divider v-if="i"></v-divider>
 
                                                 <v-list-item @click.self="saveAction(action);">
-                                                    <v-list-title v-if="!action._edit">{{action.name}}</v-list-title>
-                                                    <v-text-field v-else single-line hide-details clearable variant="underlined" @keyup.enter="action._edit = false;" v-model="action.name"></v-text-field>
+                                                    <v-list-title v-if="!actions_edit[i]">{{action}}</v-list-title>
+                                                    <v-text-field v-else single-line hide-details clearable variant="underlined" @keyup.enter="actions_edit[i] = false;" v-model="action"></v-text-field>
 
                                                     <template #append>
-                                                        <template v-if="action._edit">
+                                                        <template v-if="actions_edit[i]">
                                                             <div class="d-flex flex-column">
                                                                 <v-btn flat density="comfortable" icon="mdi-menu-up-outline" :style="{'visibility': i === 0 ? 'hidden' : 'revert'}" @click="actions.splice(i - 1, 2, actions[i], actions[i - 1]);"></v-btn>
                                                                 <v-btn flat density="comfortable" icon="mdi-menu-down-outline" :style="{'visibility': i + 1 === actions.length ? 'hidden' : 'revert'}" @click="actions.splice(i, 2, actions[i + 1], actions[i]);"></v-btn>
                                                             </div>
 
                                                             <v-btn flat density="comfortable" icon="mdi-playlist-remove" @click="actions.splice(i, 1);"></v-btn>
-                                                            <v-btn flat density="comfortable" icon="mdi-playlist-check" :disabled="!action.name" @click="action._edit = false;"></v-btn>
+                                                            <v-btn flat density="comfortable" icon="mdi-playlist-check" :disabled="!action" @click="actions_edit[i] = false;"></v-btn>
                                                         </template>
 
-                                                        <v-btn v-else flat density="comfortable" icon="mdi-playlist-edit" @click="action._edit = true;"></v-btn>
+                                                        <v-btn v-else flat density="comfortable" icon="mdi-playlist-edit" @click="actions_edit[i] = true;"></v-btn>
                                                     </template>
                                                 </v-list-item>
                                             </template>
@@ -361,24 +361,22 @@
                 setup() {
                     const {pushToast} = vueUseDialog();
 
-                    /** @typedef {{name: string; _edit: boolean;}} Action */
+                    /** @type {Ref<{date: string; actions: string[]; memo: string;}[]>} */
+                    const reports = _ref(createStorage("session", "report", []));
+                    /** @type {Ref<string[]>} */
+                    const actions = _ref(createStorage("session", "action", []));
 
-                    /** @type {Ref<Action[]>} */
-                    const actions = _ref(createStorage("session", "actions", []));
+                    const actions_edit = _ref(Array.from({length: actions.value.length}, () => false));
                     const newActionName = _ref("");
                     const memo = _ref("");
 
                     function pushAction() {
-                        actions.value.push({
-                            name: newActionName.value,
-                            _edit: false
-                        });
-
+                        actions.value.push(newActionName.value);
                         newActionName.value = "";
                     }
 
                     /**
-                    * @param {Action} action
+                    * @param {string} action
                     * @return {void}
                     */
                     function saveAction(action) {
@@ -389,10 +387,10 @@
                     }
 
                     function saveMemo() {
-                        memo.value;
+                        memo.value = "";
                     }
 
-                    return {actions, memo, newActionName, pushAction, saveAction, saveMemo};
+                    return {actions, actions_edit, newActionName, memo, pushAction, saveAction, saveMemo};
                 }
             })
         }, {

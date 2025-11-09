@@ -402,11 +402,18 @@
                     * @param {string} action
                     * @return {void}
                     */
-                    function saveAction(action) {
-                        pushToast("green", "dummy");
-                        _confetti();
+                    function toggleAction(action) {
+                        if (todayReport.value.actions.includes(action)) {
+                            while (todayReport.value.actions.includes(action)) {
+                                todayReport.value.actions.splice(todayReport.value.actions.indexOf(action), 1);
+                            }
 
-                        console.log(action);
+                            pushToast("green", "解除しました");
+                        } else {
+                            todayReport.value.actions.push(action);
+                            _confetti();
+                            pushToast("green", "登録しました");
+                        }
                     }
 
                     function saveMemo() {

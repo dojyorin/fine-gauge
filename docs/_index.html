@@ -395,7 +395,7 @@
                                             <v-divider></v-divider>
 
                                             <v-list-item>
-                                                <v-text-field single-line hide-details clearable variant="underlined" placeholder="項目" v-model="newAction"></v-text-field>
+                                                <v-text-field single-line hide-details clearable variant="underlined" placeholder="アクション" v-model="newAction"></v-text-field>
 
                                                 <template #append>
                                                     <v-btn flat density="comfortable" icon="mdi-playlist-plus" :disabled="!newAction || actions.includes(newAction)" @click="actions.push(newAction); newAction = '';"></v-btn>

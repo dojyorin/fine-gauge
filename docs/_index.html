@@ -91,15 +91,15 @@
     function createStorage(type, key, value) {
         /**
          * @template {unknown} U
-         * @param {U} input
+         * @param {U} data
          * @return {U}
          */
-        function createProxy(input) {
-            if (typeof input !== "object" || input === null) {
-                return input;
+        function createProxy(data) {
+            if (typeof data !== "object" || data === null) {
+                return data;
             }
 
-            return new Proxy(input, {
+            return new Proxy(data, {
                 get(t, p) {
                     const a = Reflect.get(t, p);
 
@@ -109,7 +109,7 @@
                     const a = Reflect.set(t, p, v);
 
                     if (a) {
-                        setValue();
+                        setValue(body);
                     }
 
                     return a;
@@ -118,7 +118,7 @@
                     const a = Reflect.deleteProperty(t, p);
 
                     if (a) {
-                        setValue();
+                        setValue(body);
                     }
 
                     return a;
@@ -126,17 +126,28 @@
             });
         }
 
-        function setValue() {
-            storage.setItem(key, JSON.stringify(body));
+        /**
+         * @return {T | null}
+         */
+        function getValue() {
+            return JSON.parse(storage.getItem(key) ?? "null");
+        }
+
+        /**
+         * @param {T | null} data
+         * @return {void}
+         */
+        function setValue(data) {
+            storage.setItem(key, JSON.stringify(data));
         }
 
         const storage = type === "local" ? localStorage : sessionStorage;
-        const source = storage.getItem(key);
-        /** @type {T} */
-        const body = source ? JSON.parse(source) : structuredClone(value);
 
-        if (!source) {
-            setValue();
+        const maybe = getValue();
+        const body = structuredClone(maybe ?? value);
+
+        if (!maybe) {
+            setValue(body);
         }
 
         return createProxy(body);
@@ -358,18 +369,18 @@
                                                         <v-checkbox v-if="!actions_edit[i]" hide-details :model-value="isSelected" @update:model-value="select"></v-checkbox>
                                                     </template>
 
-                                                    <template #append>
+                                                    <template #append="{isSelected}">
                                                         <template v-if="actions_edit[i]">
                                                             <div class="d-flex flex-column">
                                                                 <v-btn flat density="comfortable" icon="mdi-menu-up-outline" :style="{'visibility': i === 0 ? 'hidden' : 'revert'}" @click="actions.splice(i - 1, 2, actions[i], actions[i - 1]);"></v-btn>
                                                                 <v-btn flat density="comfortable" icon="mdi-menu-down-outline" :style="{'visibility': i + 1 === actions.length ? 'hidden' : 'revert'}" @click="actions.splice(i, 2, actions[i + 1], actions[i]);"></v-btn>
                                                             </div>
 
-                                                            <v-btn flat density="comfortable" icon="mdi-playlist-remove" @click="actions.splice(i, 1);"></v-btn>
+                                                            <v-btn flat density="comfortable" icon="mdi-playlist-remove" @click="isSelected = false; actions.splice(i, 1);"></v-btn>
                                                             <v-btn flat density="comfortable" icon="mdi-playlist-check" :disabled="!action" @click="actions_edit[i] = false;"></v-btn>
                                                         </template>
 
-                                                        <v-btn v-else flat density="comfortable" icon="mdi-playlist-edit" @click="actions_edit[i] = true;"></v-btn>
+                                                        <v-btn v-else flat density="comfortable" icon="mdi-playlist-edit" @click="isSelected = false; actions_edit[i] = true;"></v-btn>
                                                     </template>
                                                 </v-list-item>
                                             </template>

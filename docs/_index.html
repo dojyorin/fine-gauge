@@ -142,11 +142,14 @@
         return createProxy(body);
     }
 
+    /** @type {string[]} */
+    const store_actions = createStorage("session", "action", []);
+    /** @type {{date: string; actions: string[]; memo: string;}[]} */
+    const store_reports = createStorage("session", "report", []);
+
     function vueUseReport() {
-        /** @type {Ref<string[]>} */
-        const actions = _ref(createStorage("session", "action", []));
-        /** @type {Ref<{date: string; actions: string[]; memo: string;}[]>} */
-        const reports = _ref(createStorage("session", "report", []));
+        const actions = _ref(store_actions);
+        const reports = _ref(store_reports);
 
         const today = new Date().toLocaleDateString("sv-se");
 

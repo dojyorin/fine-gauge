@@ -324,11 +324,38 @@
                 template: /*html*/`
                     <v-container>
                         <v-row>
-                            <v-col cols sm="4">
-                                <v-card height="100" color="#10B5B2" to="/diary">
+                            <v-col cols sm="4" md="3">
+                                <v-card height="100" color="cyan-darken-1" to="/diary">
                                     <v-card-item>
                                         <v-card-title>日記</v-card-title>
                                         <v-card-subtitle>今日の出来事を記録する</v-card-subtitle>
+                                    </v-card-item>
+                                </v-card>
+                            </v-col>
+
+                            <v-col cols sm="4" md="3">
+                                <v-card height="100" color="green-darken-1" to="/statistic">
+                                    <v-card-item>
+                                        <v-card-title>統計</v-card-title>
+                                        <v-card-subtitle>過去の記録を分析する</v-card-subtitle>
+                                    </v-card-item>
+                                </v-card>
+                            </v-col>
+
+                            <v-col cols sm="4" md="3">
+                                <v-card height="100" color="purple-lighten-1" to="/configure">
+                                    <v-card-item>
+                                        <v-card-title>設定</v-card-title>
+                                        <v-card-subtitle>システムの挙動を調整する</v-card-subtitle>
+                                    </v-card-item>
+                                </v-card>
+                            </v-col>
+
+                            <v-col cols sm="4" md="3">
+                                <v-card height="100" color="pink-lighten-1" to="/about">
+                                    <v-card-item>
+                                        <v-card-title>このアプリについて</v-card-title>
+                                        <v-card-subtitle>概要やヘルプなど</v-card-subtitle>
                                     </v-card-item>
                                 </v-card>
                             </v-col>

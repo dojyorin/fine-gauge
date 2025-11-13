@@ -153,6 +153,19 @@
         return createProxy(body);
     }
 
+    /**
+     * @param {string} name
+     * @param {BlobPart} data
+     * @return {void}
+     */
+    function download(name, data) {
+        const anchor = document.createElement("a");
+        anchor.download = name;
+        anchor.href = URL.createObjectURL(new Blob([data]));
+
+        anchor.click();
+    }
+
     /** @type {string[]} */
     const store_actions = createStorage("session", "action", []);
     /** @type {{date: string; actions: string[]; memo: string;}[]} */

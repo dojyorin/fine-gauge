@@ -7,348 +7,507 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50%' y='50%' style='dominant-baseline: central; text-anchor: middle; font-size: 100px;'>🚥</text></svg>">
 
 <script async type="module">
-    import {createApp, defineComponent, ref, reactive, inject, computed} from "https://esm.sh/vue@3.5.13/dist/vue.esm-bundler.js?target=esnext";
-    import {createRouter, createWebHashHistory, useRouter} from "https://esm.sh/vue-router@4.5.0/dist/vue-router.esm-bundler.js?target=esnext";
-    import {createVuetify, useDisplay, useLayout, useTheme} from "https://esm.sh/vuetify@3.7.19/dist/vuetify.esm.js?target=esnext";
-
-    import {Chart} from "https://esm.sh/chart.js@4.4.7/auto?target=esnext";
-    import {default as confetti} from "https://esm.sh/canvas-confetti@1.9.3?target=esnext";
+    import {createApp, defineComponent, ref, provide, inject} from "https://esm.sh/vue@3/dist/vue.esm-bundler.js?target=esnext";
+    import {createRouter, createWebHashHistory} from "https://esm.sh/vue-router@4?target=esnext";
+    import {createVuetify, useTheme} from "https://esm.sh/vuetify@3/dist/vuetify.esm.js?target=esnext";
 
     /**
-    * @template T
-    * @typedef {object} Ref
-    * @property {T} value
-    */
+     * @typedef {{mount(target: Element): void; use(plugin: Plugin): void;}} Vue
+     */
 
     /**
-    * @typedef {object} Notify
-    * @property {string} color
-    * @property {string} message
-    */
+     * @typedef {{install(context: Vue): void;}} Plugin
+     */
 
-    function useCommonUI() {
-        /** @type {Ref<boolean>} */
-        const nav = inject("$_nav");
-        /** @type {Ref<boolean>} */
-        const loading = inject("$_loading");
-        /** @type {Notify[]} */
-        const notifies = inject("$_notifies");
+    /**
+     * @typedef {{template: string; setup?(): Record<string, unknown> | void; components?: Record<string, Component>;}} Component
+     */
 
+    /**
+     * @template T
+     * @typedef {{value: T;}} Ref
+     */
+
+    /**
+     * @typedef {Plugin & {push(path: string): void; beforeEach(func: (to: Route, from: Route, next: () => void) => Promise<void | boolean | string>): void;}} Router
+     */
+
+    /**
+     * @typedef {{path: string; hash: string; query: Record<string, string>; params: Record<string, string>; name?: string; meta?: Record<string, unknown>;}} Route
+     */
+
+    /**
+     * @typedef {Plugin & {theme: Theme;}} Vuetify
+     */
+
+    /**
+     * @typedef {{global: {name: Ref<string>;};}} Theme
+     */
+
+    /** @type {(component: Component) => Vue} */
+    const _createApp = createApp;
+    /** @type {(component: Component) => Component} */
+    const _defineComponent = defineComponent;
+    /** @type {<T>(value: T) => Ref<T>} */
+    const _ref = ref;
+    /** @type {<T>(key: string, value: T) => void} */
+    const _provide = provide;
+    /** @type {<T>(key: string) => T} */
+    const _inject = inject;
+    /** @type {(option: {history: Record<string, unknown>; routes: {path: string; name?: string; component?: Component;}[];}) => Router} */
+    const _createRouter = createRouter;
+    /** @type {() => Record<string, unknown>} */
+    const _createWebHashHistory = createWebHashHistory;
+    /** @type {(option: {theme: {defaultTheme: string;}; defaults: Record<string, {style: Record<string, string | number>;}>;}) => Vuetify} */
+    const _createVuetify = createVuetify;
+    /** @type {() => Theme} */
+    const _useTheme = useTheme;
+
+    import {Chart} from "https://esm.sh/chart.js@4.5.1/auto?target=esnext";
+
+    /**
+     * @typedef {{type: string; data: {datasets: {data: unknown[]; label?: string; backgroundColor?: string;}[]; labels?: string[];}; options?: {plugins?: {title?: {display?: boolean; text?: string;}; tooltip?: {callbacks?: {afterLabel?(): string | string[] | void;};};};} & BarOption;}} Option
+     */
+
+    /**
+     * @typedef {{scales?: {y?: {ticks?: {stepSize?: number; precision?: number;};};};}} BarOption
+     */
+
+    /** @type {new (target: HTMLCanvasElement | OffscreenCanvas, option: Option) => {clear(): void; update(): void;} & Omit<Option, "type">} */
+    const _Chart = Chart;
+
+    import {default as confetti} from "https://esm.sh/canvas-confetti@1.9.4?target=esnext";
+
+    /** @type {(option?: {angle?: number; origin?: {x?: number; y?: number;};}) => Promise<void>} */
+    const _confetti = confetti;
+
+    /**
+     * @template {Record<string, unknown> | unknown[]} T
+     * @param {"local" | "session"} type
+     * @param {string} key
+     * @param {T} value
+     * @return {T}
+     */
+    function createStorage(type, key, value) {
         /**
-        * @param {boolean=} state
-        * @return {void}
-        */
-        function toggleNav(state) {
-            nav.value = state ?? !nav.value;
+         * @template {unknown} U
+         * @param {U} data
+         * @return {U}
+         */
+        function createProxy(data) {
+            if (typeof data !== "object" || data === null) {
+                return data;
+            }
+
+            return new Proxy(data, {
+                get(t, p) {
+                    const a = Reflect.get(t, p);
+
+                    return createProxy(a);
+                },
+                set(t, p, v) {
+                    const a = Reflect.set(t, p, v);
+
+                    if (a) {
+                        setValue(body);
+                    }
+
+                    return a;
+                },
+                deleteProperty(t, p) {
+                    const a = Reflect.deleteProperty(t, p);
+
+                    if (a) {
+                        setValue(body);
+                    }
+
+                    return a;
+                }
+            });
         }
 
         /**
-        * @param {boolean=} state
-        * @return {void}
-        */
+         * @return {T | null}
+         */
+        function getValue() {
+            return JSON.parse(storage.getItem(key) ?? "null");
+        }
+
+        /**
+         * @param {T | null} data
+         * @return {void}
+         */
+        function setValue(data) {
+            storage.setItem(key, JSON.stringify(data));
+        }
+
+        const storage = type === "local" ? localStorage : sessionStorage;
+
+        const maybe = getValue();
+        const body = structuredClone(maybe ?? value);
+
+        if (!maybe) {
+            setValue(body);
+        }
+
+        return createProxy(body);
+    }
+
+    /** @type {string[]} */
+    const store_actions = createStorage("session", "action", []);
+    /** @type {{date: string; actions: string[]; memo: string;}[]} */
+    const store_reports = createStorage("session", "report", []);
+
+    function vueUseReport() {
+        const actions = _ref(store_actions);
+        const reports = _ref(store_reports);
+
+        const today = new Date().toLocaleDateString("sv-se");
+
+        if (!reports.value.some(({date}) => date === today)) {
+            reports.value.push({
+                date: today,
+                actions: [],
+                memo: ""
+            });
+        }
+
+        const maybe = reports.value.find(({date}) => date === today);
+
+        if (!maybe) {
+            throw new ReferenceError();
+        }
+
+        const todayReport = _ref(maybe);
+
+        for (const action of todayReport.value.actions) {
+            if (!actions.value.includes(action)) {
+                actions.value.push(action);
+            }
+        }
+
+        return {actions, reports, todayReport};
+    }
+
+    function vueUseDialog() {
+        /** @type {Ref<{color: string; text: string;}[]>} */
+        const toasts = _inject("toasts");
+        /** @type {Ref<boolean>} */
+        const loading = _inject("loading");
+
+        /**
+         * @param {string} color
+         * @param {string} text
+         * @return {void}
+         */
+        function pushToast(color, text) {
+            toasts.value.push({color, text});
+        }
+
+        /**
+         * @param {boolean} [state]
+         * @return {void}
+         */
         function toggleLoading(state) {
             loading.value = state ?? !loading.value;
         }
 
-        /**
-        * @param {string} message
-        * @param {string} color
-        * @return {void}
-        */
-        function pushNotify(message, color) {
-            notifies.push({
-                message: message,
-                color: color
-            });
-        }
-
-        return {toggleNav, toggleLoading, pushNotify};
+        return {toasts, loading, pushToast, toggleLoading};
     }
 
-    const components_layout_header = defineComponent({
-        template: /*html*/`
-            <v-app-bar density="compact" class="text-white">
-                <v-app-bar-nav-icon @click="toggleNav()"></v-app-bar-nav-icon>
-                <v-app-bar-title class="text-h5">元気ゲージ</v-app-bar-title>
-
-                <template #image>
-                    <v-img gradient="45deg, #174AFF, #0ECDFF"></v-img>
-                </template>
-            </v-app-bar>
-        `,
-        setup() {
-            const {toggleNav} = useCommonUI();
-
-            return {toggleNav};
-        }
-    });
-
-    const components_layout_loading = defineComponent({
-        template: /*html*/`
-            <v-overlay persistent no-click-animation z-index="4000" class="justify-center align-center" v-model="loading">
-                <v-progress-circular indeterminate size="60" width="4" color="primary"></v-progress-circular>
-            </v-overlay>
-        `,
-        setup() {
-            /** @type {Ref<boolean>} */
-            const loading = inject("$_loading");
-
-            return {loading};
-        }
-    });
-
-    const components_layout_navigation = defineComponent({
-        template: /*html*/`
-            <v-navigation-drawer floating temporary v-model="nav">
-                <v-list nav density="compact">
-                    <v-list-item v-for="{path, name} in routes" :to="path">
-                        <v-list-item-title>{{name}}</v-list-item-title>
-                    </v-list-item>
-                </v-list>
-
-                <template #append>
-                    <v-btn tile block prepend-icon="mdi-theme-light-dark" @click="toggleTheme">Light/Dark</v-btn>
-                </template>
-            </v-navigation-drawer>
-        `,
-        setup() {
-            /** @type {Ref<boolean>} */
-            const nav = inject("$_nav");
-
-            const theme = useTheme();
-            const router = useRouter();
-
-            const routes = router.options.routes.filter(({path}) => !/:/.test(path));
-
-            function toggleTheme() {
-                theme.global.name.value = theme.global.current.value.dark ? "light" : "dark";
-            }
-
-            return {nav, routes, toggleTheme};
-        }
-    });
-
-    const components_layout_notify = defineComponent({
-        template: /*html*/`
-            <v-snackbar v-for="notify in notifies" model-value position="fixed" location="top" z-index="3000" :color="notify.color" timeout="-1" v-bind="notifyTimeout(notify, 5000)">
-                <div>{{notify.message}}</div>
-
-                <template #actions>
-                    <v-btn ripple density="comfortable" icon="mdi-close" @click="notifyTimeout(notify, 0)"></v-btn>
-                </template>
-            </v-snackbar>
-        `,
-        setup() {
-            /** @type {Notify[]} */
-            const notifies = inject("$_notifies");
-
-            /**
-            * @param {Notify} notify
-            * @param {number} ms
-            * @return {void}
-            */
-            async function notifyTimeout(notify, ms) {
-                await new Promise((done) => setTimeout(done, ms));
-
-                const i = notifies.findIndex((v) => v === notify);
-
-                if (i === -1) {
-                    return;
-                }
-
-                notifies.splice(i, 1);
-            }
-
-            return {notifies, notifyTimeout};
-        }
-    });
-
-    const layouts_default = defineComponent({
+    const vueApplication = _defineComponent({
         template: /*html*/`
             <v-app>
-                <layout-loading></layout-loading>
-                <layout-notify></layout-notify>
-                <layout-navigation></layout-navigation>
-                <layout-header></layout-header>
+                <x-toast></x-toast>
+                <x-loading></x-loading>
+                <x-header></x-header>
                 <v-main>
                     <router-view></router-view>
                 </v-main>
             </v-app>
         `,
         components: {
-            "layout-loading": components_layout_loading,
-            "layout-notify": components_layout_notify,
-            "layout-navigation": components_layout_navigation,
-            "layout-header": components_layout_header
+            "x-toast": _defineComponent({
+                template: /*html*/`
+                    <v-snackbar-queue closable location="top right" timeout="5000" v-model="toasts">
+                        <template #actions="{props}">
+                            <v-btn :="props" density="compact" icon="mdi-close"></v-btn>
+                        </template>
+                    </v-snackbar-queue>
+                `,
+                setup() {
+                    const {toasts} = vueUseDialog();
+
+                    return {toasts};
+                }
+            }),
+            "x-loading": _defineComponent({
+                template: /*html*/`
+                    <v-overlay persistent no-click-animation class="justify-center align-center" v-model="loading">
+                        <v-progress-circular indeterminate size="60" width="4" color="primary"></v-progress-circular>
+                    </v-overlay>
+                `,
+                setup() {
+                    const {loading} = vueUseDialog();
+
+                    return {loading};
+                }
+            }),
+            "x-header": _defineComponent({
+                template: /*html*/`
+                    <v-app-bar theme="dark" density="compact">
+                        <template #prepend>
+                            <v-app-bar-nav-icon @click="nav = !nav;"></v-app-bar-nav-icon>
+                        </template>
+
+                        <template #append>
+                            <v-btn icon="mdi-theme-light-dark" @click="toggleDark();"></v-btn>
+                        </template>
+
+                        <template #image>
+                            <v-img gradient="45deg, #10B5B2, #22E6B5"></v-img>
+                        </template>
+
+                        <v-app-bar-title>
+                            <router-link class="text-decoration-none text-high-emphasis" to="/">元気ゲージ</router-link>
+                        </v-app-bar-title>
+                    </v-app-bar>
+
+                    <v-navigation-drawer floating temporary v-model="nav">
+                        <v-list nav density="compact">
+                            <v-list-item to="/">
+                                <v-list-item-title>ホーム</v-list-item-title>
+                            </v-list-item>
+
+                            <v-list-item to="/diary">
+                                <v-list-item-title>日記</v-list-item-title>
+                            </v-list-item>
+
+                            <v-list-item to="/statistic">
+                                <v-list-item-title>統計</v-list-item-title>
+                            </v-list-item>
+
+                            <v-list-item to="/configure">
+                                <v-list-item-title>設定</v-list-item-title>
+                            </v-list-item>
+
+                            <v-list-item to="/about">
+                                <v-list-item-title>このアプリについて</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-navigation-drawer>
+                `,
+                setup() {
+                    const theme = _useTheme();
+
+                    const nav = _ref(false);
+
+                    function toggleDark() {
+                        theme.global.name.value = theme.global.name.value === "dark" ? "light" : "dark";
+                    }
+
+                    return {nav, toggleDark};
+                }
+            })
         },
         setup() {
-            const actions = inject("$actions");
-
-            for (let i = 0; i < 10; i++) {
-                actions.push({
-                    name: "",
-                    _edit: false
-                });
-            }
+            _provide("toasts", _ref([]));
+            _provide("loading", _ref(false));
         }
     });
 
-    const pages_index = defineComponent({
-        template: /*html*/`
-            <v-container fluid>
-                <v-row no-gutters justify="center">
-                    <v-col cols sm="8" md="4">
-                        <v-list>
-                            <template v-for="(action, i) in actions">
-                                <v-divider v-if="i"></v-divider>
-                                <v-list-item @click="perf()">
-                                    <v-list-title v-if="!action._edit">{{action.name || "(未設定)"}}</v-list-title>
-                                    <v-text-field v-else single-line clearable variant="underlined" @keyup.enter="action._edit = false" v-model="action.name"></v-text-field>
-
-                                    <template #append>
-                                        <div class="d-flex flex-column">
-                                            <v-btn v-if="action._edit" :disabled="i === 0" flat color="transparent" density="comfortable" icon="mdi-menu-up-outline" @click="actions.splice(i - 1, 2, actions[i], actions[i - 1])"></v-btn>
-                                            <v-btn v-if="action._edit" :disabled="i + 1 === actions.length" flat color="transparent" density="comfortable" icon="mdi-menu-down-outline" @click="actions.splice(i, 2, actions[i + 1], actions[i])"></v-btn>
-                                        </div>
-                                        <v-btn :disabled="actions.some(({_edit}) => _edit) && !action._edit" flat color="transparent" density="comfortable" :icon="action._edit ? 'mdi-text-box-check-outline' : 'mdi-text-box-edit-outline'" @click="action._edit = !action._edit"></v-btn>
-                                    </template>
-                                </v-list-item>
-                            </template>
-                        </v-list>
-
-                        <v-textarea placeholder="ひとこと日記" v-model="memo"></v-textarea>
-
-                        <v-btn color="green" @click="registEntry()">登録</v-btn>
-
-                        <v-btn @click="debugLog(actions, memo)">debug</v-btn>
-                    </v-col>
-                </v-row>
-            </v-container>
-        `,
-        setup() {
-            const {pushNotify} = useCommonUI();
-            const actions = inject("$actions");
-            const memo = inject("$memo");
-
-            function debugLog(...v) {
-                confetti();
-                console.log(...v);
-                pushNotify("Console Log", "green");
-            }
-
-            function perf() {
-                console.log(actions);
-            }
-
-            function registEntry() {
-                pushNotify("dummy", "green");
-            }
-
-            return {actions, memo, perf, registEntry, debugLog};
-        }
-    });
-
-    const pages_graph = defineComponent({
-        template: /*html*/`
-            <v-container fluid>
-                <v-row no-gutters justify="center">
-                    <v-col cols sm="8" md="4">
-                        <v-row>
-                            <v-col cols>
-                                <v-card>
-                                    <v-card-title>グラフ</v-card-title>
-                                </v-card>
-                            </v-col>
-                        </v-row>
-                    </v-col>
-                </v-row>
-            </v-container>
-        `
-    });
-
-    const pages_config = defineComponent({
-        template: /*html*/`
-            <v-container fluid>
-                <v-row no-gutters justify="center">
-                    <v-col cols sm="8" md="4">
-                        <v-row>
-                            <v-col cols>
-                                <v-card>
-                                    <v-card-title>設定</v-card-title>
-                                </v-card>
-                            </v-col>
-                        </v-row>
-                    </v-col>
-                </v-row>
-            </v-container>
-        `
-    });
-
-    const pages_backup = defineComponent({
-        template: /*html*/`
-            <v-container fluid>
-                <v-row no-gutters justify="center">
-                    <v-col cols sm="8" md="4">
-                        <v-row>
-                            <v-col cols>
-                                <v-card>
-                                    <v-card-title>データバックアップ</v-card-title>
-                                </v-card>
-                            </v-col>
-                        </v-row>
-                    </v-col>
-                </v-row>
-            </v-container>
-        `
-    });
-
-    const pages_about = defineComponent({
-        template: /*html*/`
-            <v-container fluid>
-                <v-row no-gutters justify="center">
-                    <v-col cols sm="8" md="4">
-                        <v-row>
-                            <v-col cols>
-                                <v-card>
-                                    <v-card-title>このアプリについて</v-card-title>
-                                </v-card>
-                            </v-col>
-                        </v-row>
-                    </v-col>
-                </v-row>
-            </v-container>
-        `
-    });
-
-    const router = createRouter({
-        history: createWebHashHistory(),
+    const vueRouter = _createRouter({
+        history: _createWebHashHistory(),
         routes: [{
             path: "/",
-            name: "ホーム",
-            component: pages_index
+            component: _defineComponent({
+                template: /*html*/`
+                    <v-container>
+                        <v-row>
+                            <v-col cols sm="4" md="3">
+                                <v-card height="100" color="cyan-darken-1" to="/diary">
+                                    <v-card-item>
+                                        <v-card-title>日記</v-card-title>
+                                        <v-card-subtitle>今日の出来事を記録する</v-card-subtitle>
+                                    </v-card-item>
+                                </v-card>
+                            </v-col>
+
+                            <v-col cols sm="4" md="3">
+                                <v-card height="100" color="green-darken-1" to="/statistic">
+                                    <v-card-item>
+                                        <v-card-title>統計</v-card-title>
+                                        <v-card-subtitle>過去の記録を分析する</v-card-subtitle>
+                                    </v-card-item>
+                                </v-card>
+                            </v-col>
+
+                            <v-col cols sm="4" md="3">
+                                <v-card height="100" color="purple-lighten-1" to="/configure">
+                                    <v-card-item>
+                                        <v-card-title>設定</v-card-title>
+                                        <v-card-subtitle>システムの挙動を調整する</v-card-subtitle>
+                                    </v-card-item>
+                                </v-card>
+                            </v-col>
+
+                            <v-col cols sm="4" md="3">
+                                <v-card height="100" color="pink-lighten-1" to="/about">
+                                    <v-card-item>
+                                        <v-card-title>このアプリについて</v-card-title>
+                                        <v-card-subtitle>概要やヘルプなど</v-card-subtitle>
+                                    </v-card-item>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                `
+            })
         }, {
-            path: "/graph",
-            name: "グラフ",
-            component: pages_graph
+            path: "/diary",
+            component: _defineComponent({
+                template: /*html*/`
+                    <v-container style="max-width: 600px;">
+                        <v-card flat color="transparent">
+                            <v-card-item>
+                                <v-card-title class="text-h4">{{todayReport.date.replace("-", "年 ").replace("-", "月 ").concat("日")}} の日記</v-card-title>
+                                <v-card-subtitle>できたことを記録しよう！</v-card-subtitle>
+                            </v-card-item>
+                        </v-card>
+
+                        <v-row>
+                            <v-col cols="12">
+                                <v-card>
+                                    <v-card-item>
+                                        <v-list selectable select-strategy="independent" v-model:selected="todayReport.actions">
+                                            <v-list-item v-if="!actions.length">
+                                                <v-list-title>(アクションがありません)</v-list-title>
+                                            </v-list-item>
+
+                                            <template v-for="(action, i) in actions">
+                                                <v-divider v-if="i"></v-divider>
+
+                                                <v-list-item :value="action">
+                                                    <v-list-title v-if="!actions_edit[i]">{{action}}</v-list-title>
+                                                    <v-text-field v-else single-line hide-details clearable variant="underlined" @keyup.enter="actions_edit[i] = false;" v-model="action"></v-text-field>
+
+                                                    <template #prepend="{isSelected, select}">
+                                                        <v-checkbox v-if="!actions_edit[i]" hide-details :model-value="isSelected" @update:model-value="select"></v-checkbox>
+                                                    </template>
+
+                                                    <template #append="{isSelected}">
+                                                        <template v-if="actions_edit[i]">
+                                                            <div class="d-flex flex-column">
+                                                                <v-btn flat density="comfortable" icon="mdi-menu-up-outline" :style="{'visibility': i === 0 ? 'hidden' : 'revert'}" @click="actions.splice(i - 1, 2, actions[i], actions[i - 1]);"></v-btn>
+                                                                <v-btn flat density="comfortable" icon="mdi-menu-down-outline" :style="{'visibility': i + 1 === actions.length ? 'hidden' : 'revert'}" @click="actions.splice(i, 2, actions[i + 1], actions[i]);"></v-btn>
+                                                            </div>
+
+                                                            <v-btn flat density="comfortable" icon="mdi-playlist-remove" @click="isSelected = false; actions.splice(i, 1);"></v-btn>
+                                                            <v-btn flat density="comfortable" icon="mdi-playlist-check" :disabled="!action" @click="actions_edit[i] = false;"></v-btn>
+                                                        </template>
+
+                                                        <v-btn v-else flat density="comfortable" icon="mdi-playlist-edit" @click="isSelected = false; actions_edit[i] = true;"></v-btn>
+                                                    </template>
+                                                </v-list-item>
+                                            </template>
+
+                                            <v-divider></v-divider>
+
+                                            <v-list-item>
+                                                <v-text-field single-line hide-details clearable variant="underlined" placeholder="アクション" v-model="newAction"></v-text-field>
+
+                                                <template #append>
+                                                    <v-btn flat density="comfortable" icon="mdi-playlist-plus" :disabled="!newAction || actions.includes(newAction)" @click="actions.push(newAction); newAction = '';"></v-btn>
+                                                </template>
+                                            </v-list-item>
+                                        </v-list>
+                                    </v-card-item>
+                                </v-card>
+                            </v-col>
+
+                            <v-col cols="12">
+                                <v-card>
+                                    <v-card-text>
+                                        <v-textarea hide-details clearable no-resize variant="underlined" label="メモ帳" v-model="todayReport.memo"></v-textarea>
+                                    </v-card-text>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                `,
+                setup() {
+                    const {pushToast} = vueUseDialog();
+                    const {actions, todayReport} = vueUseReport();
+
+                    const actions_edit = _ref(Array.from({length: actions.value.length}, () => false));
+                    const newAction = _ref("");
+
+                    return {actions, todayReport, actions_edit, newAction};
+                }
+            })
         }, {
-            path: "/config",
-            name: "設定",
-            component: pages_config
+            path: "/statistic",
+            component: _defineComponent({
+                template: /*html*/`
+                    <v-container>
+                        <v-card flat color="transparent">
+                            <v-card-item>
+                                <v-card-title class="text-h4">統計</v-card-title>
+                            </v-card-item>
+                        </v-card>
+                    </v-container>
+                `
+            })
         }, {
-            path: "/backup",
-            name: "データバックアップ",
-            component: pages_backup
+            path: "/configure",
+            component: _defineComponent({
+                template: /*html*/`
+                    <v-container>
+                        <v-card flat color="transparent">
+                            <v-card-item>
+                                <v-card-title class="text-h4">設定</v-card-title>
+                            </v-card-item>
+                        </v-card>
+                    </v-container>
+                `
+            })
         }, {
             path: "/about",
-            name: "このアプリについて",
-            component: pages_about
+            component: _defineComponent({
+                template: /*html*/`
+                    <v-container>
+                        <v-card flat color="transparent">
+                            <v-card-item>
+                                <v-card-title class="text-h4">このアプリについて</v-card-title>
+                            </v-card-item>
+                        </v-card>
+                    </v-container>
+                `
+            })
         }, {
             path: "/:catchAll(.*)",
-            redirect: "/"
+            component: _defineComponent({
+                template: /*html*/`
+                    <v-container fluid class="justify-center fill-height">
+                        <v-card flat color="transparent">
+                            <v-card-item class="justify-center">
+                                <v-card-title class="text-h3">🥺Not Found🥺</v-card-title>
+                            </v-card-item>
+
+                            <v-card-actions class="justify-center">
+                                <v-btn to="/" class="text-h6">Back to Top</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-container>
+                `
+            })
         }]
     });
 
-    const vuetify = createVuetify({
+    const vueVuetify = _createVuetify({
+        theme: {
+            defaultTheme: "system"
+        },
         defaults: {
             VBtn: {
                 style: {
@@ -360,33 +519,14 @@
         }
     });
 
-    const component = {
-        install(context) {
-            // context.component("x-reflect", components_reflect);
-        }
-    };
-
-    const provide = {
-        install(context) {
-            context.provide("$_nav", ref(false));
-            context.provide("$_loading", ref(false));
-            context.provide("$_notifies", reactive([]));
-
-            context.provide("$actions", reactive([]));
-            context.provide("$memo", ref(""));
-        }
-    };
-
-    const vue = createApp(layouts_default);
-    vue.use(router);
-    vue.use(vuetify);
-    vue.use(component);
-    vue.use(provide);
+    const vue = _createApp(vueApplication);
+    vue.use(vueRouter);
+    vue.use(vueVuetify);
     vue.mount(document.getElementById("vue"));
 </script>
 
 <style>
-    @import "https://esm.sh/vuetify@3.7.19/dist/vuetify.css";
+    @import "https://esm.sh/vuetify@3/dist/vuetify.css";
     @import "https://esm.sh/@mdi/font@7.4.47/css/materialdesignicons.css";
     @import "https://fonts.googleapis.com/css?family=M+PLUS+1+Code:wght@100;200;300;400;500;600;700";
 

@@ -481,8 +481,81 @@
                                 <v-card-title class="text-h4">設定</v-card-title>
                             </v-card-item>
                         </v-card>
+
+                        <v-row>
+                            <v-col cols="12">
+                                <v-card>
+                                    <v-card-item>
+                                        <v-card-title>バックアップとリストア</v-card-title>
+                                    </v-card-item>
+
+                                    <v-card-actions>
+                                        <v-dialog scrollable persistent max-width="500">
+                                            <template #activator="{props}">
+                                                <v-btn :="props">バックアップ</v-btn>
+                                            </template>
+
+                                            <template #="{isActive}">
+                                                <v-card>
+                                                    <v-card-item>
+                                                        <v-card-title>バックアップ</v-card-title>
+                                                    </v-card-item>
+
+                                                    <v-card-text>
+                                                        データベースからファイルにエクスポートします。
+                                                    </v-card-text>
+
+                                                    <v-card-actions>
+                                                        <v-btn color="red" @click="exportReport(); isActive.value = false;">実行</v-btn>
+                                                        <v-btn @click="isActive.value = false;">キャンセル</v-btn>
+                                                    </v-card-actions>
+                                                </v-card>
+                                            </template>
+                                        </v-dialog>
+
+                                        <v-dialog scrollable persistent max-width="500">
+                                            <template #activator="{props}">
+                                                <v-btn :="props">リストア</v-btn>
+                                            </template>
+
+                                            <template #="{isActive}">
+                                                <v-card>
+                                                    <v-card-item>
+                                                        <v-card-title>リストア</v-card-title>
+                                                    </v-card-item>
+
+                                                    <v-card-text>
+                                                        ファイルからデータベースにインポートします。
+
+                                                        <div class="text-red">[注意] 既存のデータは全て削除されます。</div>
+                                                    </v-card-text>
+
+                                                    <v-card-actions>
+                                                        <v-btn color="red" @click="importReport(); isActive.value = false;">実行</v-btn>
+                                                        <v-btn @click="isActive.value = false;">キャンセル</v-btn>
+                                                    </v-card-actions>
+                                                </v-card>
+                                            </template>
+                                        </v-dialog>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-col>
+                        </v-row>
                     </v-container>
-                `
+                `,
+                setup() {
+                    const {reports} = vueUseReport();
+
+                    function importReport() {
+                        reports.value.splice(0);
+                    }
+
+                    function exportReport() {
+                        download(`${new Date().toLocaleString("sv-se").replace("-", "").replace(" ", "").replace(":", "")}.json`, JSON.stringify(reports.value));
+                    }
+
+                    return {importReport, exportReport};
+                }
             })
         }, {
             path: "/about",

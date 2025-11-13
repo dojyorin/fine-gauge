@@ -566,10 +566,30 @@
                     </v-container>
                 `,
                 setup() {
+                    const {pushToast} = vueUseDialog();
                     const {reports} = vueUseReport();
 
-                    function importReport() {
-                        reports.value.splice(0);
+                    async function importReport() {
+                        try {
+                            const json = await upload(false, ".json");
+                            const json_reports = _z.object({
+                                date: _z.iso.date(),
+                                actions: _z.string().noempty().array(),
+                                memo: _z.string()
+                            }).strict().array().parse(JSON.parse(await json.text()));
+
+                            reports.value.splice(0);
+
+                            for (const report of json_reports) {
+                                reports.value.push(report);
+                            }
+
+                            pushToast("green", "リストア成功");
+                        } catch (error) {
+                            pushToast("red", "リストア失敗");
+
+                            throw error;
+                        }
                     }
 
                     function exportReport() {

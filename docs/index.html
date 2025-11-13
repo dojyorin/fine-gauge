@@ -405,7 +405,7 @@
                     <v-container style="max-width: 600px;">
                         <v-card flat color="transparent">
                             <v-card-item>
-                                <v-card-title class="text-h4">{{todayReport.date.replace("-", "年 ").replace("-", "月 ").concat("日")}} の日記</v-card-title>
+                                <v-card-title class="text-h4">{{todayReport.date.replaceAll("-", "/")}} の日記</v-card-title>
                                 <v-card-subtitle>できたことを記録しよう！</v-card-subtitle>
                             </v-card-item>
                         </v-card>

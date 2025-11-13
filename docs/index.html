@@ -574,6 +574,7 @@
 
                         try {
                             const json = await upload(false, ".json");
+                            /** @type {typeof reports["value"]} */
                             const json_reports = _z.object({
                                 date: _z.iso.date(),
                                 actions: _z.string().noempty().array(),

@@ -566,10 +566,12 @@
                     </v-container>
                 `,
                 setup() {
-                    const {pushToast} = vueUseDialog();
+                    const {pushToast, toggleLoading} = vueUseDialog();
                     const {reports} = vueUseReport();
 
                     async function importReport() {
+                        toggleLoading(true);
+
                         try {
                             const json = await upload(false, ".json");
                             const json_reports = _z.object({
@@ -589,6 +591,8 @@
                             pushToast("red", "リストア失敗");
 
                             throw error;
+                        } finally {
+                            toggleLoading(false);
                         }
                     }
 

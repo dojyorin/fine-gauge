@@ -81,6 +81,11 @@
     /** @type {(option?: {angle?: number; origin?: {x?: number; y?: number;};}) => Promise<void>} */
     const _confetti = confetti;
 
+    import {z} from "https://esm.sh/zod@4.1.12?target=esnext";
+
+    /** @type {unknown} */
+    const _z = z;
+
     /**
      * @template {Record<string, unknown> | unknown[]} T
      * @param {"local" | "session"} type

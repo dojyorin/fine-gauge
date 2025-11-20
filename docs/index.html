@@ -419,7 +419,7 @@
                                                 <v-divider v-if="i"></v-divider>
 
                                                 <v-list-item :value="action">
-                                                    <v-list-title v-if="!actions_edit[i]">{{action}}</v-list-title>
+                                                    <v-list-item-title v-if="!actions_edit[i]">{{action}}</v-list-item-title>
                                                     <v-text-field v-else single-line hide-details clearable v-model="action" @keyup.enter="actions_edit[i] = false;"></v-text-field>
 
                                                     <template #prepend="{isSelected, select}">

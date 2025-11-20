@@ -420,7 +420,7 @@
 
                                                 <v-list-item :value="action">
                                                     <v-list-item-title v-if="!actions_edit[i]">{{action}}</v-list-item-title>
-                                                    <v-text-field v-else single-line hide-details clearable v-model="action" @keyup.enter="actions_edit[i] = false;"></v-text-field>
+                                                    <v-text-field v-else hide-details single-line v-model="action" @keyup.enter="actions_edit[i] = false;"></v-text-field>
 
                                                     <template #prepend="{isSelected, select}">
                                                         <v-checkbox v-if="!actions_edit[i]" hide-details :model-value="isSelected" @update:model-value="select"></v-checkbox>

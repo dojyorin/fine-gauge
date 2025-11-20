@@ -424,7 +424,7 @@
 
                                                 <v-list-item :value="action">
                                                     <v-list-title v-if="!actions_edit[i]">{{action}}</v-list-title>
-                                                    <v-text-field v-else single-line hide-details clearable variant="underlined" @keyup.enter="actions_edit[i] = false;" v-model="action"></v-text-field>
+                                                    <v-text-field v-else single-line hide-details clearable v-model="action" @keyup.enter="actions_edit[i] = false;"></v-text-field>
 
                                                     <template #prepend="{isSelected, select}">
                                                         <v-checkbox v-if="!actions_edit[i]" hide-details :model-value="isSelected" @update:model-value="select"></v-checkbox>
@@ -449,7 +449,7 @@
                                             <v-divider></v-divider>
 
                                             <v-list-item>
-                                                <v-text-field single-line hide-details clearable variant="underlined" placeholder="アクション" v-model="newAction"></v-text-field>
+                                                <v-text-field single-line hide-details clearable placeholder="アクション" v-model="newAction"></v-text-field>
 
                                                 <template #append>
                                                     <v-btn flat density="comfortable" icon="mdi-playlist-plus" :disabled="!newAction || actions.includes(newAction)" @click="actions.push(newAction); newAction = '';"></v-btn>
@@ -463,7 +463,7 @@
                             <v-col cols="12">
                                 <v-card>
                                     <v-card-text>
-                                        <v-textarea hide-details clearable no-resize variant="underlined" label="メモ帳" v-model="todayReport.memo"></v-textarea>
+                                        <v-textarea hide-details clearable no-resize label="メモ帳" v-model="todayReport.memo"></v-textarea>
                                     </v-card-text>
                                 </v-card>
                             </v-col>
@@ -512,7 +512,7 @@
                                     </v-card-item>
 
                                     <v-card-actions>
-                                        <v-dialog scrollable persistent max-width="500">
+                                        <v-dialog>
                                             <template #activator="{props}">
                                                 <v-btn :="props">バックアップ</v-btn>
                                             </template>
@@ -528,14 +528,14 @@
                                                     </v-card-text>
 
                                                     <v-card-actions>
-                                                        <v-btn color="blue" @click="exportReport(); isActive.value = false;">実行</v-btn>
+                                                        <v-btn variant="outlined" color="blue" @click="exportReport(); isActive.value = false;">実行</v-btn>
                                                         <v-btn @click="isActive.value = false;">キャンセル</v-btn>
                                                     </v-card-actions>
                                                 </v-card>
                                             </template>
                                         </v-dialog>
 
-                                        <v-dialog scrollable persistent max-width="500">
+                                        <v-dialog>
                                             <template #activator="{props}">
                                                 <v-btn :="props">リストア</v-btn>
                                             </template>
@@ -553,7 +553,7 @@
                                                     </v-card-text>
 
                                                     <v-card-actions>
-                                                        <v-btn color="red" @click="importReport(); isActive.value = false;">実行</v-btn>
+                                                        <v-btn variant="outlined" color="red" @click="importReport(); isActive.value = false;">実行</v-btn>
                                                         <v-btn @click="isActive.value = false;">キャンセル</v-btn>
                                                     </v-card-actions>
                                                 </v-card>
@@ -648,6 +648,16 @@
             VTextField: {
                 variant: "underlined",
                 color: "blue"
+            },
+            VTextarea: {
+                variant: "underlined",
+                color: "blue"
+            },
+            VDialog: {
+                persistent: true,
+                scrollable: true,
+                maxHeight: 800,
+                maxWidth: 600
             }
         }
     });

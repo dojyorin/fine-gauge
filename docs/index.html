@@ -596,7 +596,7 @@
                     }
 
                     function exportReport() {
-                        download(`${new Date().toLocaleString("sv-se").replace("-", "").replace(" ", "").replace(":", "")}.json`, JSON.stringify(reports.value));
+                        download(`${new Date().toLocaleString("sv-se").replace(/\D/g, "")}.json`, JSON.stringify(reports.value));
                     }
 
                     return {importReport, exportReport};

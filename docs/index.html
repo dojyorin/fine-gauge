@@ -207,15 +207,13 @@
             });
         }
 
-        const maybeReport = reports.value.find(({date}) => date === today);
+        const todayReport = reports.value.find(({date}) => date === today);
 
-        if (!maybeReport) {
+        if (!todayReport) {
             throw new ReferenceError();
         }
 
-        const todayReport = _ref(maybeReport);
-
-        for (const action of todayReport.value.actions) {
+        for (const action of todayReport.actions) {
             if (!actions.value.includes(action)) {
                 actions.value.push(action);
             }

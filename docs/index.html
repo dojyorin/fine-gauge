@@ -11,7 +11,7 @@
     import {createVuetify, useTheme} from "https://esm.sh/vuetify@4.1.7/dist/vuetify.esm.js?target=esnext";
 
     /**
-     * @typedef {{mount(target: Element): void; use(plugin: Plugin): void;}} Vue
+     * @typedef {{mount(target: string | Element): Record<string, unknown>; use(plugin: Plugin): Vue;}} Vue
      */
 
     /**
@@ -247,7 +247,7 @@
         return {toasts, loading, pushToast, toggleLoading};
     }
 
-    const vueApplication = _defineComponent({
+    const component = _defineComponent({
         template: /*html*/`
             <v-app>
                 <x-toast></x-toast>
@@ -348,7 +348,7 @@
         }
     });
 
-    const vueRouter = _createRouter({
+    const router = _createRouter({
         history: _createWebHashHistory(),
         routes: [{
             path: "/",
@@ -632,7 +632,7 @@
         }]
     });
 
-    const vueVuetify = _createVuetify({
+    const vuetify = _createVuetify({
         theme: {
             defaultTheme: "system"
         },
@@ -657,10 +657,7 @@
         }
     });
 
-    const vue = _createApp(vueApplication);
-    vue.use(vueRouter);
-    vue.use(vueVuetify);
-    vue.mount(document.getElementById("vue"));
+    _createApp(component).use(router).use(vuetify).mount("#root");
 </script>
 
 <style>
@@ -676,4 +673,4 @@
 
 <title>元気ゲージ</title>
 
-<div id="vue"></div>
+<div id="root"></div>

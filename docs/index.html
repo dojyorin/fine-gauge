@@ -6,9 +6,13 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50%' y='50%' style='dominant-baseline: central; text-anchor: middle; font-size: 100px;'>🚥</text></svg>">
 
 <script async type="module">
-    import {createApp, defineComponent, ref, provide, inject} from "https://esm.sh/vue@3.5.42/dist/vue.esm-bundler.js?target=esnext";
+    import {createApp, defineComponent, ref, provide, inject, computed} from "https://esm.sh/vue@3.5.42/dist/vue.esm-bundler.js?target=esnext";
     import {createRouter, createWebHashHistory} from "https://esm.sh/vue-router@5.3.1/dist/vue-router.js?target=esnext";
     import {createVuetify, useTheme} from "https://esm.sh/vuetify@4.1.7/dist/vuetify.esm.js?target=esnext";
+
+    if (!globalThis.Temporal) {
+        await import("https://esm.sh/temporal-polyfill@1.0.1/global?target=esnext");
+    }
 
     /**
      * @typedef {{mount(target: string | Element): Record<string, unknown>; use(plugin: Plugin): Vue;}} Vue
@@ -53,6 +57,8 @@
     const _provide = provide;
     /** @type {<T>(key: string) => T} */
     const _inject = inject;
+    /** @type {<T>(func: () => T) => Ref<T>} */
+    const _computed = computed;
     /** @type {(option: {history: Record<string, unknown>; routes: {path: string; name?: string; component?: Component;}[];}) => Router} */
     const _createRouter = createRouter;
     /** @type {() => Record<string, unknown>} */
@@ -171,38 +177,38 @@
         a.click();
     }
 
+    /** @type {{date: string; gauge: string[]; memo: string;}[]} */
+    const diary = createStorage(sessionStorage, "diary", []);
     /** @type {string[]} */
-    const store_actions = createStorage("session", "action", []);
-    /** @type {{date: string; actions: string[]; memo: string;}[]} */
-    const store_reports = createStorage("session", "report", []);
+    const gauge = createStorage(sessionStorage, "gauge", []);
 
-    function vueUseReport() {
-        const actions = _ref(store_actions);
-        const reports = _ref(store_reports);
+    function vueUseDiary() {
+        const diaryRef = _ref(diary);
+        const gaugeRef = _ref(gauge);
 
-        const today = new Date().toLocaleDateString("sv-se");
+        const today = Temporal.Now.plainDateISO().toString();
 
-        if (!reports.value.some(({date}) => date === today)) {
-            reports.value.push({
-                date: today,
-                actions: [],
-                memo: ""
-            });
-        }
+        const diaryPageToday = _computed(() => diaryRef.value.find(({date}) => date === today));
 
-        const todayReport = reports.value.find(({date}) => date === today);
-
-        if (!todayReport) {
-            throw new Error();
-        }
-
-        for (const action of todayReport.actions) {
-            if (!actions.value.includes(action)) {
-                actions.value.push(action);
+        /**
+         * @param {string[]} gauge
+         * @param {string} memo
+         * @return {void}
+         */
+        function writeDiary(gauge, memo) {
+            if (diaryPageToday.value) {
+                diaryPageToday.value.gauge = gauge;
+                diaryPageToday.value.memo = memo;
+            } else {
+                diaryRef.value.push({
+                    date: today,
+                    gauge: [],
+                    memo: ""
+                });
             }
         }
 
-        return {actions, reports, todayReport};
+        return {diaryRef, gaugeRef, diaryPageToday, writeDiary};
     }
 
     function vueUseDialog() {

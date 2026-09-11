@@ -55,7 +55,7 @@
     const _ref = ref;
     /** @type {<T>(key: string, value: T) => void} */
     const _provide = provide;
-    /** @type {<T>(key: string) => T} */
+    /** @type {<T>(key: string) => T | undefined} */
     const _inject = inject;
     /** @type {<T>(func: () => T) => Ref<T>} */
     const _computed = computed;
@@ -192,11 +192,15 @@
         return {diaryRef, gaugeRef, diaryPageToday, writeDiary};
     }
 
-    function vueUseDialog() {
-        /** @type {Ref<{color: string; text: string;}[]>} */
+    function useDialog() {
+        /** @type {ReturnType<typeof _inject<Ref<{color: string; text: string;}[]>>>} */
         const toasts = _inject("toasts");
-        /** @type {Ref<boolean>} */
+        /** @type {ReturnType<typeof _inject<Ref<boolean>>>} */
         const loading = _inject("loading");
+
+        if (!toasts || !loading) {
+            throw new Error();
+        }
 
         /**
          * @param {string} color
@@ -204,6 +208,10 @@
          * @return {void}
          */
         function pushToast(color, text) {
+            if (!toasts) {
+                throw new Error();
+            }
+
             toasts.value.push({color, text});
         }
 
@@ -212,6 +220,10 @@
          * @return {void}
          */
         function toggleLoading(state) {
+            if (!loading) {
+                throw new Error();
+            }
+
             loading.value = state ?? !loading.value;
         }
 
@@ -239,7 +251,7 @@
                     </v-snackbar-queue>
                 `,
                 setup() {
-                    const {toasts} = vueUseDialog();
+                    const {toasts} = useDialog();
 
                     return {toasts};
                 }
@@ -251,7 +263,7 @@
                     </v-overlay>
                 `,
                 setup() {
-                    const {loading} = vueUseDialog();
+                    const {loading} = useDialog();
 
                     return {loading};
                 }

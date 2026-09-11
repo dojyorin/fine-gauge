@@ -449,8 +449,8 @@
                     </v-container>
                 `,
                 setup() {
-                    const {pushToast} = vueUseDialog();
-                    const {actions, todayReport} = vueUseReport();
+                    const {pushToast} = useDialog();
+                    const {} = useDiary();
 
                     const actions_edit = _ref(Array.from({length: actions.value.length}, () => false));
                     const newAction = _ref("");
@@ -544,8 +544,8 @@
                     </v-container>
                 `,
                 setup() {
-                    const {pushToast, toggleLoading} = vueUseDialog();
-                    const {reports} = vueUseReport();
+                    const {pushToast, toggleLoading} = useDialog();
+                    const {} = useDiary();
 
                     async function importReport() {
                         toggleLoading(true);

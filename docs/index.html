@@ -78,7 +78,7 @@
      * @typedef {{scales?: {y?: {ticks?: {stepSize?: number; precision?: number;};};};}} BarOption
      */
 
-    /** @type {new (target: HTMLCanvasElement | OffscreenCanvas, option: Option) => {clear(): void; update(): void;} & Omit<Option, "type">} */
+    /** @type {new (target: string | HTMLCanvasElement | OffscreenCanvas, option: Option) => {clear(): void; update(): void;} & Omit<Option, "type">} */
     const _Chart = Chart;
 
     import {default as confetti} from "https://esm.sh/canvas-confetti@1.9.4?target=esnext";

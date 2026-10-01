@@ -5,10 +5,18 @@
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50%' y='50%' style='dominant-baseline: central; text-anchor: middle; font-size: 100px;'>🚥</text></svg>">
 
+<script type="importmap">
+    {
+        "imports": {
+            "vue": "https://esm.sh/vue@3.5.43/dist/vue.esm-bundler.js?target=esnext"
+        }
+    }
+</script>
+
 <script type="module">
-    import {createApp, defineComponent, ref, provide, inject, computed} from "https://esm.sh/vue@3.5.43/dist/vue.esm-bundler.js?target=esnext";
-    import {createRouter, createWebHashHistory} from "https://esm.sh/vue-router@5.3.1/dist/vue-router.js?target=esnext";
-    import {createVuetify, useTheme} from "https://esm.sh/vuetify@4.1.7/dist/vuetify.esm.js?target=esnext";
+    import {createApp, defineComponent, ref, provide, inject, computed} from "https://esm.sh/vue@3.5.43?target=esnext";
+    import {createRouter, createWebHashHistory} from "https://esm.sh/vue-router@5.3.1?target=esnext";
+    import {createVuetify, useTheme} from "https://esm.sh/vuetify@4.2.3/dist/vuetify.js?target=esnext&external=vue";
 
     if (!globalThis.Temporal) {
         await import("https://esm.sh/temporal-polyfill@1.0.5/global?target=esnext");
@@ -644,7 +652,7 @@
 </script>
 
 <style>
-    @import "https://esm.sh/vuetify@4.1.7/dist/vuetify.css";
+    @import "https://esm.sh/vuetify@4.2.3/dist/vuetify.css";
     @import "https://esm.sh/@mdi/font@7.4.47/css/materialdesignicons.css";
     @import "https://esm.sh/@fontsource/m-plus-1-code@5.3.0/index.css";
 
